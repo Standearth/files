@@ -189,7 +189,7 @@
             var img = encodeURI(data[0].og_img.split('?')[0]);
             var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+' style="background-position:center;background-size:cover;position:relative;"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
             $('.dc_btns').append(el);
-            $('$dc'+i).css("background-image","url("+img+")");
+            $('#dc'+i).css("background-image","url("+img+")");
         });
       })
     } else {
@@ -202,7 +202,7 @@
           var o_campaign = data[0].st_campaign;
           var o_geo = data[0].st_geo;
           $ajax({
-            url: "https://stand-en-api.herokuapp.com/api/pages?st_geo="+o_geo+"&st_type="+o_type,
+            url: "https://stand-en-api.herokuapp.com/api/pages?st_geo="+o_geo+"&st_type="+o_type+"&en_status=live",
           }).done(function(data) {
             console.log(data);
           });
