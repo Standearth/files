@@ -147,18 +147,20 @@
    };
 
   function getPageInfo(query) {
-    if (query.length > 0) {
-      $.ajax({
-        url: "https://stand-en-api.herokuapp.com/api/pages?"+query,
-        }).done(function(data){
-        return data;
-        }); 
-    } else {
+    if (query == 'All') {
       $.ajax({
         url: "https://stand-en-api.herokuapp.com/api/pages",
         }).done(function(data){
+        console.log(data);
         return data;
         });
+    } else {
+      $.ajax({
+        url: "https://stand-en-api.herokuapp.com/api/pages?"+query,
+        }).done(function(data){
+          console.log(data);
+        return data;
+        }); 
     }
   }
   
@@ -172,12 +174,12 @@
         var details = getPageInfo("id="+d);
         console.log(details);
       })
-      getPageInfo("id=")
     } else {
       // Get current page ID and info
       var page_id = window.location.href.split('act.stand.earth/page/')[1].split('/')[0];
       var page_info = getPageInfo("id="+page_id);
       console.log(page_info);
+      
       // Get related or random pages from the API
 
     }
