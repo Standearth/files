@@ -146,20 +146,20 @@
      return false;
    };
 
-  function getPageInfo(query) {
+  async function getPageInfo(query) {
     if (query == 'All') {
-      $.ajax({
+      await $.ajax({
         url: "https://stand-en-api.herokuapp.com/api/pages",
         }).done(function(data){
         console.log(data);
-        return data;
+        return(data);
         });
     } else {
-      $.ajax({
+      await $.ajax({
         url: "https://stand-en-api.herokuapp.com/api/pages?"+query,
         }).done(function(data){
           console.log(data);
-        return data;
+        return(data);
         }); 
     }
   }
@@ -167,18 +167,19 @@
   function loadDaisyChain() {
     // Check if data-pages attriute exists
     var pages = $('.dc_btns').data('pages').split(',');
-    console.log(pages);
     if (pages.length > 0) {
       // Pull info on data-pages 
       pages.forEach(function(d,i) {
-        var details = getPageInfo("id="+d);
-        console.log(details);
+        getPageInfo("id="+d).then(function(v,e) {
+          console.log(v);
+        });
       })
     } else {
       // Get current page ID and info
       var page_id = window.location.href.split('act.stand.earth/page/')[1].split('/')[0];
-      var page_info = getPageInfo("id="+page_id);
-      console.log(page_info);
+      getPageInfo("id="+page_id).then(function(v,e) {
+        console.log(v);
+      });
       
       // Get related or random pages from the API
 
