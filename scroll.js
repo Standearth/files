@@ -186,7 +186,7 @@
               default:
                 var cta = 'Take action';
             }
-            var img = data[0].og_img.split('?')[0];
+            var img = encodeURI(data[0].og_img.split('?')[0]);
             var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+' style="background-image:url(\''+img+'\');background-position:center;background-size:cover;position:relative;"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
             $('.dc_btns').append(el);
         });
@@ -194,9 +194,12 @@
     } else {
       // Get current page ID and info
       var page_id = window.location.href.split('act.stand.earth/page/')[1].split('/')[0];
-      getPageInfo("id="+page_id).then(function(v,e) {
-        console.log(v);
-      });
+      $.ajax({
+        url: "https://stand-en-api.herokuapp.com/api/pages?id="+page_id,
+        }).done(function(data) {
+          var o_type = data[0].type;
+          var o_campaign = data[0].
+        });
       
       // Get related or random pages from the API
 
