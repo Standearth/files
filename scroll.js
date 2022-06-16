@@ -176,11 +176,11 @@
             console.log(data);
             var url = data[0].og_url.split('?')[0];
             var title = data[0].og_title;
-            switch(data[0].en_type) {
-              case 'dc':
+            switch(data[0].st_type) {
+              case 'pet':
                 var cta = 'Sign the petition';
                 break;
-              case 'et':
+              case 'let':
                 var cta = 'Send a message';
                 break;
               default:
@@ -197,8 +197,11 @@
       $.ajax({
         url: "https://stand-en-api.herokuapp.com/api/pages?id="+page_id,
         }).done(function(data) {
-          var o_type = data[0].type;
-          var o_campaign = data[0].
+          var o_type = data[0].st_type;
+          var o_campaign = data[0].st_campaign;
+          var o_geo = data[0].st_geo;
+          
+
         });
       
       // Get related or random pages from the API
