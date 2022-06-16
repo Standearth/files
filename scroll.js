@@ -187,7 +187,7 @@
                 var cta = 'Take action';
             }
             var img = data[0].og_img;
-            var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+' style="background-image:url("'+img+'");background-position:center;background-size:cover;position:relative;"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
+            var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+' style="background-image:url(\''+img+'\');background-position:center;background-size:cover;position:relative;"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
             $('.dc_btns').append(el);
         });
       })
