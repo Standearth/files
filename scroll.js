@@ -170,9 +170,13 @@
     if (pages.length > 0) {
       // Pull info on data-pages 
       pages.forEach(function(d,i) {
-        getPageInfo("id="+d).then(function(v,e) {
-          console.log(v);
-          var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_1" id="dc1"><div class="overlay"><a href="https://act.stand.earth/page/35202/petition/1?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>Sign now: Stop burning trees for electricity</h2></div><div class="dc_cta"><h3>Take action</h3></div></a></div></div>'
+        getPageInfo("id="+d).then(function(data,error) {
+          console.log(data);
+          var url = data[0].og_url;
+          var title = data[0].og_title;
+          var cta = 'Take Action';
+          var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+'"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
+          $('.dc_btns').append(el);
         });
       })
     } else {
