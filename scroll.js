@@ -213,7 +213,8 @@
             var filtered = data.filter(function(d) {
               console.log(d);
               console.log(d.st_campaign);
-              return d.st_campaign != o_campaign;
+              console.log(o_campaign);
+              return d.st_campaign.toLowerCase() != o_campaign.toLowerCase();
             })
             console.log(filtered);
           });
