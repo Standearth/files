@@ -218,7 +218,7 @@
                 url: "https://stand-en-api.herokuapp.com/api/pages?status=live",
               }).done(function(data) {
                 var filtered = data.filter(function(d) {
-                  if (d.st_campaign.toLowerCase() != o_campaign.toLowerCase() & d.og_url !== null & d.og_title !== null & d.og_img !== null) {
+                  if (d.st_campaign.toLowerCase() != o_campaign.toLowerCase() & d.og_url !== null & d.og_title !== null & d.og_img !== null & d.st_type != 'don') {
                     return true;
                   } else {
                     return false;
