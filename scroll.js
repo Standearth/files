@@ -212,7 +212,7 @@
                 return false;
               }
             })
-            var dcs = array();
+            var dcs = [];
             if (filtered.length < 3) {
               $.ajax({
                 url: "https://stand-en-api.herokuapp.com/api/pages?status=live",
