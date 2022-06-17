@@ -201,7 +201,8 @@
           var o_type = data[0].st_type;
           var o_campaign = data[0].st_campaign;
           var o_geo = data[0].st_geo;
-          $ajax({
+          // Get related or random pages from the API
+          $.ajax({
             url: "https://stand-en-api.herokuapp.com/api/pages?st_geo="+o_geo+"&st_type="+o_type+"&en_status=live",
           }).done(function(data) {
             console.log(data);
@@ -209,14 +210,9 @@
 
         });
       
-      // Get related or random pages from the API
+      
 
     }
-
-
-    
-    
-    // Populate daisy chain boxes
     
   }
 
