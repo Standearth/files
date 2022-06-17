@@ -206,9 +206,8 @@
           console.log(o_campaign);
           console.log(o_type);
           // Get related or random pages from the API
-          console.log("https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live");
           $.ajax({
-            url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live",
+            url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"&type="+o_type+"&status=live",
           }).done(function(data) {
             console.log(data);
             var filtered = data.filter(function(d) {
