@@ -166,7 +166,7 @@
   
   function loadDaisyChain() {
     // Check if data-pages attriute exists
-    if ($('dc_btns').hasAttribute('data-pages')) {
+    if (typeof($('dc_btns').data('pages')) !== 'undefined') {
       var pages = $('.dc_btns').data('pages').split(',');
       // Pull info on data-pages 
       pages.forEach(function(d,i) {
