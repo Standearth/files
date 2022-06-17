@@ -216,13 +216,19 @@
                 return false;
               }
             })
-            console.log(filtered);
             var pet = filtered.filter(function(d) {
               return d.st_type.toLowerCase() == 'pet'
             })
+            var pets = pet.sort(() => 0.5 - Math.random()).slice(0,1);
+            console.log(pets);
             var let = filtered.filter(function(d) {
               return d.st_type.toLowerCase() == 'let'
             })
+            var lets = let[Math.floor(Math.random()*let.length)]
+            console.log(lets);
+
+
+
           });
 
         });
