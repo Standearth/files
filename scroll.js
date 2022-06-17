@@ -201,9 +201,12 @@
           var o_type = data[0].st_type;
           var o_campaign = data[0].st_campaign;
           var o_geo = data[0].st_geo;
+          console.log(o_geo);
+          console.log(o_campaign);
+          console.log(o_type);
           // Get related or random pages from the API
           $.ajax({
-            url: "https://stand-en-api.herokuapp.com/api/pages?st_geo="+o_geo+"&st_type="+o_type+"&en_status=live",
+            url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live",
           }).done(function(data) {
             console.log(data);
           });
