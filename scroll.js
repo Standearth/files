@@ -198,6 +198,7 @@
       $.ajax({
         url: "https://stand-en-api.herokuapp.com/api/pages?id="+page_id,
         }).done(function(data) {
+          console.log(data);
           var o_type = data[0].st_type;
           var o_campaign = data[0].st_campaign;
           var o_geo = data[0].st_geo;
@@ -205,6 +206,7 @@
           console.log(o_campaign);
           console.log(o_type);
           // Get related or random pages from the API
+          console.log("https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live");
           $.ajax({
             url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live",
           }).done(function(data) {
