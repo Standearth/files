@@ -234,7 +234,7 @@
               var pet = filtered.filter(function(d) {
                 return d.st_type.toLowerCase() == 'pet'
               })
-              dcs.push(pet.sort(() => 0.5 - Math.random()).slice(0,2));
+              dcs = pet.sort(() => 0.5 - Math.random()).slice(0,2);
               
               var let = filtered.filter(function(d) {
                 return d.st_type.toLowerCase() == 'let'
