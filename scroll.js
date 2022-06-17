@@ -219,13 +219,33 @@
             var pet = filtered.filter(function(d) {
               return d.st_type.toLowerCase() == 'pet'
             })
-            var pets = pet.sort(() => 0.5 - Math.random()).slice(0,1);
-            console.log(pets);
+            var dcs = pet.sort(() => 0.5 - Math.random()).slice(0,2);
+            
             var let = filtered.filter(function(d) {
               return d.st_type.toLowerCase() == 'let'
             })
-            var lets = let[Math.floor(Math.random()*let.length)]
-            console.log(lets);
+            dcs.push(let[Math.floor(Math.random()*let.length)])
+            console.log(dcs);
+
+            dcs.forEach(function(d,i) {
+              var url = data[0].og_url.split('?')[0];
+              var title = data[0].og_title;
+              switch(data[0].st_type) {
+                case 'pet':
+                  var cta = 'Sign the petition';
+                  break;
+                case 'let':
+                  var cta = 'Send a message';
+                  break;
+                default:
+                  var cta = 'Take action';
+              }
+              var img = data[0].og_img.split('?')[0];
+              var el = '<div class="dc_btn gtm_event" data-event="petition-scroll-dc_'+i+'" id="dc'+i+'" style="background-position:center;background-size:cover;position:relative;"><div class="overlay"><a href="'+url+'?chain&amp;ea.tracking.id=act-page&amp;xvar=dc" target="_new"><div class="dc_content"><h2>'+title+'</h2></div><div class="dc_cta"><h3>'+cta+'</h3></div></a></div></div>';
+              $('.dc_btns').append(el);
+              $('#dc'+i).css("background-image","url("+img+")");
+              })
+            
 
 
 
