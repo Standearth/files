@@ -206,7 +206,7 @@
             url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"&status=live",
           }).done(function(data) {
             var filtered = data.filter(function(d) {
-              if (d.st_campaign.toLowerCase() != o_campaign.toLowerCase() & d.og_url == 'fff' & d.og_title !== null & d.og_img !== null) {
+              if (d.st_campaign.toLowerCase() != o_campaign.toLowerCase() & d.og_url !== null & d.og_title !== null & d.og_img !== null) {
                 return true;
               } else {
                 return false;
@@ -225,6 +225,8 @@
                   }
                 })
               });
+              console.log(data);
+              console.log(filtered);
               dcs.push(filtered.sort(() => 0.5 - Math.random()).slice(0,3));
               console.log('full');
               console.log(dcs);
