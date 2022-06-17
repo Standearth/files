@@ -218,10 +218,10 @@
             })
             console.log(filtered);
             var pet = filtered.filter(function(d) {
-              return d.st_type.toLowerCase() = 'pet'
+              return d.st_type.toLowerCase() == 'pet'
             })
             var let = filtered.filter(function(d) {
-              return d.st_type.toLowerCase() = 'let'
+              return d.st_type.toLowerCase() == 'let'
             })
           });
 
