@@ -209,6 +209,10 @@
             url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"type="+o_type+"&status=live",
           }).done(function(data) {
             console.log(data);
+            var filtered = data.filter(function(d) {
+              return d.st_campaign != o_campaign;
+            })
+            console.log(filtered);
           });
 
         });
