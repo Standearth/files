@@ -224,7 +224,7 @@
                     return false;
                   }
                 })
-                dcs.push(filtered.sort(() => 0.5 - Math.random()).slice(0,3));
+                dcs = filtered.sort(() => 0.5 - Math.random()).slice(0,3);
                 console.log('full');
                 console.log(dcs);
               });
