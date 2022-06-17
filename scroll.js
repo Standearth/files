@@ -211,6 +211,8 @@
           }).done(function(data) {
             console.log(data);
             var filtered = data.filter(function(d) {
+              console.log(d);
+              console.log(d.st_campaign);
               return d.st_campaign != o_campaign;
             })
             console.log(filtered);
