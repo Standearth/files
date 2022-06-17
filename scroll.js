@@ -166,8 +166,8 @@
   
   function loadDaisyChain() {
     // Check if data-pages attriute exists
-    var pages = $('.dc_btns').data('pages').split(',');
-    if (pages.length > 0) {
+    if ($('dc_btns').hasAttribute('data-pages')) {
+      var pages = $('.dc_btns').data('pages').split(',');
       // Pull info on data-pages 
       pages.forEach(function(d,i) {
         $.ajax({
@@ -191,7 +191,7 @@
             $('.dc_btns').append(el);
             $('#dc'+i).css("background-image","url("+img+")");
         });
-      })
+        })
     } else {
       // Get current page ID and info
       var page_id = window.location.href.split('act.stand.earth/page/')[1].split('/')[0];
