@@ -207,16 +207,22 @@
           console.log(o_type);
           // Get related or random pages from the API
           $.ajax({
-            url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"&type="+o_type+"&status=live",
+            url: "https://stand-en-api.herokuapp.com/api/pages?geo="+o_geo+"&status=live",
           }).done(function(data) {
-            console.log(data);
             var filtered = data.filter(function(d) {
-              console.log(d);
-              console.log(d.st_campaign);
-              console.log(o_campaign);
-              return d.st_campaign.toLowerCase() != o_campaign.toLowerCase();
+              if (d.st_campaign.toLowerCase() != o_campaign.toLowerCase() & d.og_url !== null & d.og_title !== null & d.og_img !== null) {
+                return true;
+              } else {
+                return false;
+              }
             })
             console.log(filtered);
+            var pet = filtered.filter(function(d) {
+              return d.st_type.toLowerCase() = 'pet'
+            })
+            var let = filtered.filter(function(d) {
+              return d.st_type.toLowerCase() = 'let'
+            })
           });
 
         });
