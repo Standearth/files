@@ -145,28 +145,10 @@
  
      return false;
    };
-
-  async function getPageInfo(query) {
-    if (query == 'All') {
-      $.ajax({
-        url: "https://stand-en-api.herokuapp.com/api/pages",
-        }).done(function(data){
-        console.log(data);
-        return data;
-        });
-    } else {
-      $.ajax({
-        url: "https://stand-en-api.herokuapp.com/api/pages?"+query,
-        }).done(function(data){
-          console.log(data);
-        return data;
-        }); 
-    }
-  }
   
   function loadDaisyChain() {
     // Check if data-pages attriute exists
-    if (typeof($('dc_btns').data('pages')) !== 'undefined') {
+    if (typeof($('.dc_btns').data('pages')) !== 'undefined') {
       var pages = $('.dc_btns').data('pages').split(',');
       // Pull info on data-pages 
       pages.forEach(function(d,i) {
