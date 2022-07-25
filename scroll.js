@@ -61,30 +61,6 @@
      }
      return false;
      });
- 
- // log a custom event click
-   $('.gtm_event').click(function () {
-     if ($(this).data('event')) {
- 
-       if ($(this).hasClass('donate')) {
- 
-         // donation buttons need to be handled specially, so we can set the donation value.
-         // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
-         $('.donate_clicked').removeClass('donate_clicked');
-         $(this).addClass('donate_clicked');
- 
-         var amt = $(this).html().replace(/\D/g, '');
-         dataLayer.push({
-           'event': $(this).data('event'),
-           'petition-scroll-value': amt,
-           'eventCallback': donate_redirect
-         });
- 
-       } else {
-         dataLayer.push({ 'event': $(this).data('event') });
-       }
-     }
-   });
 
 // default donate url
   var donateurl = 'https://act.stand.earth/page/10790/donate/1?xvar=scroll';    
@@ -231,6 +207,7 @@
               });
               
             } else {
+              console.log(filtered);
               var pet = filtered.filter(function(d) {
                 return d.st_type.toLowerCase() == 'pet'
               })
@@ -277,6 +254,30 @@
   }
 
   loadDaisyChain()
+
+  // log a custom event click
+  $('.gtm_event').click(function () {
+    if ($(this).data('event')) {
+
+      if ($(this).hasClass('donate')) {
+
+        // donation buttons need to be handled specially, so we can set the donation value.
+        // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
+        $('.donate_clicked').removeClass('donate_clicked');
+        $(this).addClass('donate_clicked');
+
+        var amt = $(this).html().replace(/\D/g, '');
+        dataLayer.push({
+          'event': $(this).data('event'),
+          'petition-scroll-value': amt,
+          'eventCallback': donate_redirect
+        });
+
+      } else {
+        dataLayer.push({ 'event': $(this).data('event') });
+      }
+    }
+  });
    
   function donate_redirect() {
     location.href = donateurl;
