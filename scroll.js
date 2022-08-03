@@ -207,7 +207,6 @@
               });
               
             } else {
-              console.log(filtered);
               var pet = filtered.filter(function(d) {
                 return d.st_type.toLowerCase() == 'pet'
               })
