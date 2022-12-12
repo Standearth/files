@@ -80,7 +80,7 @@
          data: $('form.en__component--page').serialize()
        })
          .done(function (msg) {
-           donateurl = msg.match(/\bhttps?:\/\/\S+donate+/gi)[0]+'/1?chain&xvar=scroll';
+           donateurl = msg.match(/\bhttps?:\/\/act.stand.earth\S+donate+/gi)[0]+'/1?chain&xvar=scroll';
            if (~msg.indexOf('"pageType":"donation"')) {
              if (typeof customCodeSignupComplete === 'function') {
                customCodeSignupComplete();
