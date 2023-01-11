@@ -202,7 +202,7 @@ width:100%;
                     })
                     .html(function (d,i) {
                         if (data[d.order]['URLs'] && d.name == 'Does the company have a tar sands policy?') {
-                            return "<a href="+data[d.order]['URLs']+">"+d.value+"</a>";
+                            return "<a href="+data[d.order]['URLs']+" target='_new'>"+d.value+"</a>";
                         } else if (d.name == 'Company Name') {
                             return "<h4>"+d.value+"</h4>";
                         } else {
