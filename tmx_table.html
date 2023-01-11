@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Un-insuring Trans</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<style>
+body {
+    font-family:'Roboto';
+}
+.select-wrapper input.select-dropdown {
+display:none !important;
+}
+.select-wrapper select {
+display:block !important;
+width:75%;
+margin:auto;
+background:#f3f3f3;
+margin-bottom:20px;
+}
+
+.select-wrapper svg {
+display:none !important;
+}
+	table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+
+        tr:nth-of-type(odd) { 
+            background: #f3f3f3; 
+        }
+        th { 
+            background: #e50b12; 
+            color: #fff !important; 
+            font-weight: bold !important; 
+            cursor: s-resize;
+            background-repeat: no-repeat;
+            background-position: 3% center;
+        }
+        td, th { 
+            padding: 6px; 
+            border: 1px solid #b6121c; 
+            text-align: left; 
+        }
+        
+        th.des:after {
+          content: "\21E9";
+        }
+        
+        th.aes:after {
+          content: "\21E7";
+        }
+        td:nth-child(4) {
+            display:none;
+        }
+
+        th:nth-child(4) {
+            display:none;
+        }
+	
+	@media (max-width: 760px) {
+        
+            table, thead, tbody, th, td, tr { 
+                display: block; 
+            }
+            .select-wrapper select {
+display:block !important;
+width:100%;
+}
+            thead tr { 
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr { border: 1px solid #ccc; }
+            
+            td { 
+                border: none;
+                border-bottom: 1px solid #eee; 
+                /*position: relative;
+                padding-left: 50%; */
+            }
+            
+            td:before { 
+                /*position: absolute;*/
+                /*top: 6px;
+                left: 6px;
+                width: 45%; */
+                padding-right: 10px; 
+            }
+            
+            /*
+            Label the data
+            */
+            td:before {
+              content: attr(data-th) ": ";
+              font-weight: bold;
+              width: 6.5em;
+              /*display: inline-block;*/
+            }
+        }
+       
+	</style>
+</head>
+<body>
+<div class="select-wrapper"><input class="select-dropdown dropdown-trigger" type="text" readonly="true" data-target="select-options-4da9158f-9096-7d3e-c4db-7fdd013d4c20"><ul id="select-options-4da9158f-9096-7d3e-c4db-7fdd013d4c20" class="dropdown-content select-dropdown" tabindex="0"></ul><svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg><select name="policy-list" id="policy-list" tabindex="-1">
+            <option value="All">Has the company ruled out insuring TMX?</option><option value="Yes">Yes</option><option value="No">No</option><option value="Maybe">Maybe</option></select></div>
+	<div id="table-wrap">
+	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+	 <script type="text/javascript">
+            var full_data, rows, rows_entries;
+              d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRNotLD8HDsJlF5T4B18VwZOr1JHtCrcPSACnRAydWgRqh_plaP5AOxSJlNtK1YmgqobQLedyChMUmR/pub?gid=0&single=true&output=csv", function(error, data) {
+                  if (error) throw error;
+                  full_data = data;
+                  var sortAscending = true;
+                  var table = d3.select("#table-wrap").append('table');
+                  var titles = d3.keys(data[0]);
+                  var headers = table.append('thead').append('tr')
+                                   .selectAll('th')
+                                   .data(titles).enter()
+                                   .append('th')
+                                   .filter(function(d) { return d != 'Notes' && d != 'URLs'})
+                                   .text(function (d) {
+                                        return d;
+                                    })
+                                    .on('click', function (d) {
+                                       headers.attr('class', 'header');
+                                       
+                                       if (sortAscending) {
+                                            rows.sort(function(a,b) { 
+                                                        if (a[d].toUpperCase() < b[d].toUpperCase()) { 
+                                                        return -1; 
+                                                        } else if (a[d].toUpperCase() > b[d].toUpperCase()) { 
+                                                        return 1; 
+                                                        } else {
+                                                        return 0;
+                                                        }
+                                                    });
+                                                                            sortAscending = false;
+                                                                            this.className = 'aes';
+                                                                        } else {
+                                            rows.sort(function(a,b) { 
+                                                        if (a[d].toUpperCase() > b[d].toUpperCase()) { 
+                                                        return -1; 
+                                                        } else if (a[d].toUpperCase() < b[d].toUpperCase()) { 
+                                                        return 1; 
+                                                        } else {
+                                                        return 0;
+                                                        }
+                                                    });
+                                         sortAscending = true;
+                                         this.className = 'des';
+                                       }
+                                       
+                                   });
+                  
+                rows = table.append('tbody').selectAll('tr')
+                               .data(data).enter()
+                               .append('tr')
+                               .attr("class",function(d,i) {
+                                   return data[i]['Country'];
+                               })
+                               .attr("class",function(d,i) {
+                                   var classname;
+                                   if (data[i]['Has the company ruled out insuring Trans Mountain?'] == 'Yes') {
+                                       classname = 'Yes'
+                                   } else if (data[i]['Has the company ruled out insuring Trans Mountain?'] == 'No') {
+                                       classname = "No"
+                                   } else if (data[i]['Has the company ruled out insuring Trans Mountain?'] == 'Maybe') {
+                                       classname = "Maybe"
+                                   } else if (data[i]['Has the company ruled out insuring Trans Mountain?'] == 'Yes, policy rules out involvement.') {
+                                        classname = "Yes"
+                                   } else { 
+                                       classname = "empty"
+                                   }
+                                   return classname + ' ' + data[i]['Country'];
+                               });
+                  
+                rows_entries = rows.selectAll('td')
+                    .data(function (d,i) {
+                        return titles.map(function (k) {
+                            return { 'value': d[k], 'name': k, 'order':i};
+                        });
+                    }).enter()
+                    .append('td')
+                    .filter(function(d) { return d.name != 'Notes' && d.name != 'URLs'})
+                    .attr('data-th', function (d) {
+                        return d.name;
+                    })
+                    .html(function (d,i) {
+                        if (data[d.order]['URLs'] && d.name == 'Does the company have a tar sands policy?') {
+                            return "<a href="+data[d.order]['URLs']+">"+d.value+"</a>";
+                        } else if (d.name == 'Company Name') {
+                            return "<h2>"+d.value+"</h2>";
+                        } else {
+                            return d.value;
+                        }
+                    });
+                
+                
+                
+                function populateDropdowns() {
+                    var country = d3.nest()
+                        .key(function(d) { return d.Country})
+                        .entries(full_data);
+
+                    var policy = d3.nest()
+                        .key(function(d) { return d["Has the company ruled out insuring Trans Mountain?"]})
+                        .entries(full_data);
+                    
+                    console.log(country);
+                    
+                    var countries = country.map(function(d){ return d.key }) // list of group names
+                    //var policies = policy.map(function(d){ return d.key }) // list of group names
+var policies = ['Yes','No','Maybe'];
+                    
+                    var country_dropDown = d3.select("#country-list");
+                    var policy_dropDown = d3.select("#policy-list");
+        
+        
+                    country_dropDown.selectAll("option")
+                        .data(countries)
+                        .enter()
+                        .append("option")
+                        .text(function(d) {return d})
+                        .attr("value", function(d) {return d})
+        
+                    country_dropDown.insert("option",":first-child")
+                        .text('All countries')
+                        .attr("value","All")
+                        .property("selected", true)
+
+                    policy_dropDown.selectAll("option")
+                        .data(policies)
+                        .enter()
+                        .append("option")
+                        .text(function(d) {return d})
+                        .attr("value", function(d) {return d})
+        
+                    policy_dropDown.insert("option",":first-child")
+                        .text('Has the company ruled out insuring TMX?')
+                        .attr("value","All")
+                        .property("selected", true)
+        
+                }
+        
+                populateDropdowns();
+        
+        
+              });
+        
+              function filterTable(filter) {
+                if(filter == 'country') {
+                    var filter_country = document.getElementById('country-list').value;  
+                    var r = d3.selectAll('tbody tr')
+                    r.each(function(d) {
+                        if (filter_country == 'All') {
+                            d3.selectAll('tbody tr').attr("style","display:table-row;");
+                        } else if (this.classList.contains(filter_country)) {
+                            d3.select(this).attr("style","display:table-row;");
+                        } else {
+                            d3.select(this).attr("style","display:none;");
+                        }
+                    }) 
+                } else {
+                    var filter_policy = document.getElementById('policy-list').value;  
+                    var pp;
+                    if (filter_policy == 'Yes') {
+                                       pp = 'Yes'
+                                   } else if (filter_policy == 'No') {
+                                       pp = "No"
+                                   } else if (filter_policy == 'Maybe') {
+                                       pp = "Maybe"
+                                   } else if (filter_policy == 'Yes, policy rules out involvement.') {
+                                        pp = "Yes"
+                                   } else { 
+                                       pp = "empty"
+                                   }
+                    
+var r = d3.selectAll('tbody tr');
+                    r.each(function(d) {
+                        if (pp == "empty") {
+                            d3.selectAll('tbody tr').attr("style","display:table-row;");
+                        } else if (this.classList.contains(pp)) {
+                            d3.select(this).attr("style","display:table-row;");
+                        } else {
+                            d3.select(this).attr("style","display:none;");
+                        }
+                    }) 
+                }
+                    
+                    
+                        
+                }
+        
+              // listener
+            d3.select("#country-list").on('change',function() {
+                filterTable("country");
+            });
+            d3.select("#policy-list").on('change',function() {
+                filterTable("policy");
+            });
+            </script>
+Note: Aspen is a maybe here because it has said it is cutting ties but has not confirmed that it will never insure a Trans Mountain pipeline again.</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Apollo</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Ark</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Ascot Underwriting</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?"></td></tr><tr class="No UK"><td data-th="Company Name"><h2>Beazley</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Berkshire Hathaway</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Brit</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Canopius</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>CNA Hardy</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Energy Insurance Limited</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Hiscox</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Inigo</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Liberty Mutual</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Lloyd's</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?"><a href="https://www.lloyds.com/~/media/files/about/responsible-business/esg/lloyds_esgreport_2020.pdf">Yes, but it is not clear if it is mandatory for all syndicates.</a></td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Markel</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Marsh</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No Japan"><td data-th="Company Name"><h2>Mitsui Sumitomo</h2></td><td data-th="Country">Japan</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No UK"><td data-th="Company Name"><h2>Newline Group</h2></td><td data-th="Country">UK</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?"></td></tr><tr class="No Bermuda"><td data-th="Company Name"><h2>SiriusPoint</h2></td><td data-th="Country">Bermuda</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?"></td></tr><tr class="No Japan"><td data-th="Company Name"><h2>Sompo</h2></td><td data-th="Country">Japan</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Starr</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No Canada"><td data-th="Company Name"><h2>Stewart Specialty Risk Underwriting</h2></td><td data-th="Country">Canada</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No Switzerland"><td data-th="Company Name"><h2>Swiss Re</h2></td><td data-th="Country">Switzerland</td><td data-th="Does the company have a tar sands policy?"><a href="https://reports.swissre.com/corporate-responsibility-report/2018/servicepages/downloads/files/2018_corporate_responsibility_report_swissre_crr18.pdf">Yes</a></td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>The Hartford</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?"><a href="https://www.businesswire.com/news/home/20191220005515/en/Hartford-Announces-Policy-Insuring-Investing-Coal-Tar">Yes, but it does not apply to pipelines.</a></td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No Japan"><td data-th="Company Name"><h2>Tokio Marine</h2></td><td data-th="Country">Japan</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr><tr class="No USA"><td data-th="Company Name"><h2>Travelers</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?"><a href="https://sustainability.travelers.com/downloads/coal-tar-sands-policy.pdf">Yes, but it does not apply to pipelines.</a></td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">November 2020 email to Rainforest Action Network: "Please note that Travelers’ support, if any, for tar sands projects/companies is de minimis, at most."</td></tr><tr class="No USA"><td data-th="Company Name"><h2>W.R. Berkley</h2></td><td data-th="Country">USA</td><td data-th="Does the company have a tar sands policy?">No</td><td></td><td data-th="Has the company ruled out insuring Trans Mountain?">No</td><td data-th="What has the company said?">–</td></tr></tbody></table></div>
+</div>
+
+</body>
+</html>

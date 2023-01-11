@@ -32,7 +32,6 @@
   font-family : 'Readex Pro', sans-serif;
   padding : 13px 20px 10px 20px;
   color : rgb(255, 255, 255);
-  border : 1px solid #e50b12;
   background : #e50b12;
   cursor : pointer;
   display : inline-block;
@@ -280,7 +279,7 @@
   flex-shrink: 1;
   margin:1.35rem;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 12px;
   display: block;
   -webkit-box-shadow: 0px 0px 16px 2px rgb(0 0 0 / 15%);
   box-shadow: 0px 0px 16px 2px rgb(0 0 0 / 15%);
