@@ -38,6 +38,7 @@
   width : 150px;
   margin : 10px;
   border-radius : 50px;
+  border:none;
 }
 
 #thankyou_stage1_yesno button:hover, #thankyou_stage2_buttons button:hover {
