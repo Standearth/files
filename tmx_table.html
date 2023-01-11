@@ -6,6 +6,8 @@
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel='stylesheet' id='studiolake-style-css' href='https://stand.earth/wp-content/themes/stand/style.css?ver=202212192258' type='text/css' media='all' />
+<link rel='stylesheet' id='starter-style-css' href='https://stand.earth/wp-content/themes/stand/frontend/style.css?ver=6.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='bootstrap-css' href='https://stand.earth/wp-content/themes/stand/frontend/css/lib/bootstrap.min.css?ver=202212192258' type='text/css' media='all' />
 <style>
 body {
     font-family:'Roboto';
@@ -30,7 +32,7 @@ display:none !important;
         }
 
         tr:nth-of-type(odd) { 
-            background: #f3f3f3; 
+            background: #f5f4ed; 
         }
         th { 
             background: #e50b12; 
@@ -41,8 +43,7 @@ display:none !important;
             background-position: 3% center;
         }
         td, th { 
-            padding: 6px; 
-            border: 1px solid #b6121c; 
+            padding: 6px;  
             text-align: left; 
         }
         
@@ -195,7 +196,7 @@ width:100%;
                         if (data[d.order]['URLs'] && d.name == 'Does the company have a tar sands policy?') {
                             return "<a href="+data[d.order]['URLs']+">"+d.value+"</a>";
                         } else if (d.name == 'Company Name') {
-                            return "<h2>"+d.value+"</h2>";
+                            return "<h3>"+d.value+"</h3>";
                         } else {
                             return d.value;
                         }
