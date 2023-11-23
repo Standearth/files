@@ -269,7 +269,7 @@
         // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
         $('.donate_clicked').removeClass('donate_clicked');
         $(this).addClass('donate_clicked');
-        if ($(this.hasClass('donate_monthly'))) {
+        if ($(this).hasClass('donate_monthly')) {
           var monthly = TRUE;
         } else {
           var monthly = FALSE;
@@ -290,22 +290,16 @@
    
   function donate_redirect(monthly) {
     if (monthly) {
-      console.log('monthly')
       if (country == 'CA') {
-        console.log('ca')
-        //location.href = 'https://act.stand.earth/page/60232/donate/1?xvar=scroll';
+        location.href = 'https://act.stand.earth/page/60232/donate/1?xvar=scroll';
       } else {
-        console.log('us');
-        //location.href = 'https://act.stand.earth/page/60233/donate/1?xvar=scroll';
+        location.href = 'https://act.stand.earth/page/60233/donate/1?xvar=scroll';
       }
     } else {
-      console.log('onetime');
       if (country == 'CA') {
-        console.log('ca');
-        //location.href = 'https://act.stand.earth/page/59944/donate/1?xvar=scroll';
+        location.href = 'https://act.stand.earth/page/59944/donate/1?xvar=scroll';
       } else {
-        console.log('us');
-        //location.href = 'https://act.stand.earth/page/59970/donate/1?xvar=scroll';   
+        location.href = 'https://act.stand.earth/page/59970/donate/1?xvar=scroll';   
       }
     }
  }
