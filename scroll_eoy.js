@@ -32,7 +32,7 @@
        // slide to a new section on the thankyou page
      $('.slide').click(function (e) {
      if ($(this).data('slide') == '#thankyou_stage3_donate') {
-       donate_redirect();
+       //donate_redirect();
      } else {
        var scroll_to = $(this).data('slide');
        $(scroll_to).show();
