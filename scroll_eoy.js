@@ -269,10 +269,11 @@
         // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
         $('.donate_clicked').removeClass('donate_clicked');
         $(this).addClass('donate_clicked');
+        var monthly = false;
         if ($(this).hasClass('donate_monthly')) {
-          var monthly = TRUE;
+          monthly = true;
         } else {
-          var monthly = FALSE;
+          monthly = false;
         }
 
         var amt = $(this).html().replace(/\D/g, '');
