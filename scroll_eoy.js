@@ -62,8 +62,10 @@
      return false;
      });
 
-// default donate url
-  var donateurl = 'https://act.stand.earth/page/10790/donate/1?xvar=scroll';    
+// default donate url and country
+  var donateurl = 'https://act.stand.earth/page/59970/donate/1?xvar=scroll';   
+  var donateurl_eoy = 'https://act.stand.earth/page/59970/donate/1?xvar=scroll';    
+  var country = 'CA'
 
  // catch the engaging networks form submission, and add some custom post-submit
  // behaviour that overrides the default redirect
@@ -91,6 +93,9 @@
  
              // customize the post-signing messages with the supporter's name
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
+             country = $('#en__field_supporter_country').val();
+             console.log(country);
+             
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)
@@ -264,12 +269,17 @@
         // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
         $('.donate_clicked').removeClass('donate_clicked');
         $(this).addClass('donate_clicked');
+        if ($(this.hasClass('donate_monthly'))) {
+          var monthly = TRUE;
+        } else {
+          var monthly = FALSE;
+        }
 
         var amt = $(this).html().replace(/\D/g, '');
         dataLayer.push({
           'event': $(this).data('event'),
           'petition-scroll-value': amt,
-          'eventCallback': donate_redirect
+          'eventCallback': donate_redirect(monthly)
         });
 
       } else {
@@ -278,8 +288,20 @@
     }
   });
    
-  function donate_redirect() {
-    location.href = donateurl;
+  function donate_redirect(monthly) {
+    if (monthly) {
+      if (country == 'CA') {
+        location.href = 'https://act.stand.earth/page/60232/donate/1?xvar=scroll';
+      } else {
+        location.href = 'https://act.stand.earth/page/60233/donate/1?xvar=scroll';
+      }
+    } else {
+      if (country == 'CA') {
+        location.href = 'https://act.stand.earth/page/59944/donate/1?xvar=scroll';
+      } else {
+        location.href = 'https://act.stand.earth/page/59970/donate/1?xvar=scroll';   
+      }
+    }
  }
    
 });
