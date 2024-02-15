@@ -14,7 +14,7 @@
      }
      var emailShare = emailShare || {
        subject: encodeURI($('.page_title').html()),
-       message: encodeURI($('.en__component--copyblock').text() + "Take action at: " + window.location.href),
+       message: encodeURI("Take action at: " + window.location.href),
        showOnMobile: true
      }
      var facebookShare = $('.en__socialShares .en__socialShare--facebook').attr('href') || {
