@@ -292,16 +292,16 @@
   function donate_redirect(monthly) {
     if (monthly) {
       if (country == 'CA') {
-        location.href = 'https://act.stand.earth/page/60851/donate/1?chain&xvar=scroll';
+        location.href = 'https://act.stand.earth/page/62111/donate/1?chain&xvar=scroll';
       } else {
-        location.href = 'https://act.stand.earth/page/60854/donate/1?chain&xvar=scroll';
+        location.href = 'https://act.stand.earth/page/62117/donate/1?chain&xvar=scroll';
       }
     } else {
       console.log('onetime');
       if (country == 'CA') {
-        location.href = 'https://act.stand.earth/page/60417/donate/1?chain&xvar=scroll';
+        location.href = 'https://act.stand.earth/page/35591/donate/1?chain&xvar=scroll';
       } else {
-        location.href = 'https://act.stand.earth/page/60402/donate/1?chain&xvar=scroll';   
+        location.href = 'https://act.stand.earth/page/35591/donate/1?chain&xvar=scroll';   
       }
     }
  }
