@@ -54,7 +54,7 @@
         window.open(twitterShare, 'twShareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         
      } else if ($(this).hasClass('whatsapp')) {
-        window.open(encodeURIComponent(whatsappShare));
+        window.open(whatsappShare);
 
      } else if ($(this).hasClass('email')) {
         window.open('mailto:?subject='+emailShare.subject+'&body='+emailShare.message);
