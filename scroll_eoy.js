@@ -291,14 +291,14 @@
    
   function donate_redirect(monthly) {
     if (monthly) {
-      if (country == 'CA') {
+      if (country == 'Canada') {
         location.href = 'https://act.stand.earth/page/75220/donate/1?chain&transaction.recurrpay=Y&xvar=scroll';
       } else {
         location.href = 'https://act.stand.earth/page/77077/donate/1?chain&transaction.recurrpay=Y&xvar=scroll';
       }
     } else {
       console.log('onetime');
-      if (country == 'CA') {
+      if (country == 'Canada') {
         location.href = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll';
       } else {
         location.href = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll';   
