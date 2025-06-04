@@ -66,7 +66,7 @@
      });
 
 // default donate url
-  var donateurl = 'https://act.stand.earth/page/10790/donate/1?xvar=scroll';    
+  var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll';    
 
  // catch the engaging networks form submission, and add some custom post-submit
  // behaviour that overrides the default redirect
@@ -83,7 +83,7 @@
          data: $('form.en__component--page').serialize()
        })
          .done(function (msg) {
-           donateurl = msg.match(/\bhttps?:\/\/act.stand.earth\S+donate+/gi)[0]+'/1?chain&xvar=scroll';
+           //donateurl = msg.match(/\bhttps?:\/\/act.stand.earth\S+donate+/gi)[0]+'/1?chain&xvar=scroll';
            if (~msg.indexOf('"pageType":"donation"')) {
              if (typeof customCodeSignupComplete === 'function') {
                customCodeSignupComplete();
@@ -94,6 +94,12 @@
  
              // customize the post-signing messages with the supporter's name
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
+             var country = $('#en__field_supporter_country').val();
+             if (country == 'Canada') {
+              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll'
+
+             }
+             $('#donform').attr('src',donateurl);
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)

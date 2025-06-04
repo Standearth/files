@@ -347,3 +347,11 @@ div.dc_cta {
 .dc_content {
   padding:10px; 
 }
+
+#donform {
+  display: none; /* This hides it and removes it from document flow */
+  width: 80%; /* Example styling */
+  height: 400px; /* Example styling */
+  border: 1px solid #ccc; /* Example styling */
+  margin-top: 20px; /* Example styling */
+}
