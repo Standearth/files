@@ -9,9 +9,15 @@
   border : 0px !important;
 }
 
-#thankyou_stage1_yesno, #thankyou_stage2_buttons, #thankyou_stage3_donate {
+#thankyou_stage1_yesno, #thankyou_stage2_buttons {
   display : none;
   padding : 50px 10% 150px 10%;
+  min-height : 100vh;
+  text-align : center;
+}
+
+#thankyou_stage3_donate {
+  display : none;
   min-height : 100vh;
   text-align : center;
 }
@@ -350,9 +356,8 @@ div.dc_cta {
 
 #donform {
   display: none; /* This hides it and removes it from document flow */
-  height:520px;
+  height:100vh;
   width:100%;
-  max-width:400px;
   border:none;
   border-radius:15px;
 

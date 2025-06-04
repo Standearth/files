@@ -34,11 +34,15 @@
        var scroll_to = $(this).data('slide');
        $(scroll_to).show();
        $(scroll_to).parent().show();
-       $('html, body').animate({
-         scrollTop: $(scroll_to).offset().top - 5
-       }, 800);
        if ($(this).data('slide') == '#thankyou_stage3_donate') {
           donate_redirect();
+          $('html, body').animate({
+            scrollTop: $(scroll_to).offset().top
+          }, 800);
+        } else {
+          $('html, body').animate({
+            scrollTop: $(scroll_to).offset().top - 5
+          }, 800);
         }
      return false;
      });
@@ -65,7 +69,7 @@
      });
 
 // default donate url
-  var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&simplify=true';    
+  var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll';    
 
  // catch the engaging networks form submission, and add some custom post-submit
  // behaviour that overrides the default redirect
@@ -95,7 +99,7 @@
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
              var country = $('#en__field_supporter_country').val();
              if (country == 'Canada') {
-              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&simplify=true'
+              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll'
 
              }
              $('#donform').attr('src',donateurl);
