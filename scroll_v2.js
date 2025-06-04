@@ -74,6 +74,7 @@
        // disable submit button to prevent double-click submissions
        $('.en__submit button').addClass('disabled');
        $('body').removeClass('fixed-top');
+       $('#footer').before('<div id="thankyou_stage3_donate" class="glass"><iframe id="donform" src="" title="Support this campaign"></iframe></div>');
  
        // do submission as an AJAX call, to retain single-page scrolling for thankyou section
        $.ajax({
@@ -90,7 +91,6 @@
  
              // this is the new post-signing flow tracking
              dataLayer.push({ 'event': 'petition-scroll-init' });
- 
              // customize the post-signing messages with the supporter's name
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
              var country = $('#en__field_supporter_country').val();
@@ -99,7 +99,6 @@
 
              }
              $('#donform').attr('src',donateurl);
-             $('#footer').prepend('<div id="thankyou_stage3_donate" class="glass"><iframe id="donform" src="" title="Support this campaign"></iframe></div>');
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)
