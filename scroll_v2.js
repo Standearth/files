@@ -31,19 +31,16 @@
      
        // slide to a new section on the thankyou page
      $('.slide').click(function (e) {
+     if ($(this).data('slide') == '#thankyou_stage3_donate') {
+       donate_redirect();
+     } else {
        var scroll_to = $(this).data('slide');
        $(scroll_to).show();
        $(scroll_to).parent().show();
-       if ($(this).data('slide') == '#thankyou_stage3_donate') {
-          donate_redirect();
-          $('html, body').animate({
-            scrollTop: $(scroll_to).offset().top
-          }, 800);
-        } else {
-          $('html, body').animate({
-            scrollTop: $(scroll_to).offset().top - 5
-          }, 800);
-        }
+       $('html, body').animate({
+         scrollTop: $(scroll_to).offset().top - 5
+       }, 800);
+     }
      return false;
      });
      
@@ -78,7 +75,6 @@
        // disable submit button to prevent double-click submissions
        $('.en__submit button').addClass('disabled');
        $('body').removeClass('fixed-top');
-       $('#footer').before('<div id="thankyou_stage3_donate" class="glass"><iframe id="donform" src="" title="Support this campaign"></iframe></div>');
  
        // do submission as an AJAX call, to retain single-page scrolling for thankyou section
        $.ajax({
@@ -114,8 +110,6 @@
              $('html, body').animate({
                scrollTop: $('#thankyou_stage1_yesno').offset().top - 20
              }, 800);
-
-             $('#donform').attr('src',donateurl);
  
            } else {
              // FIXME: can we display the actual error message instead of a generic alert?
@@ -292,8 +286,7 @@
   });
    
   function donate_redirect() {
-    $('#donform').show();
-    $('#footer').hide();
+    location.href = donateurl;
  }
    
 });
