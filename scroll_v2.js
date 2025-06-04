@@ -102,7 +102,6 @@
               donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll'
 
              }
-             $('#donform').attr('src',donateurl);
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)
@@ -115,6 +114,8 @@
              $('html, body').animate({
                scrollTop: $('#thankyou_stage1_yesno').offset().top - 20
              }, 800);
+
+             $('#donform').attr('src',donateurl);
  
            } else {
              // FIXME: can we display the actual error message instead of a generic alert?
