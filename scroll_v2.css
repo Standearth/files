@@ -353,5 +353,7 @@ div.dc_cta {
   height:520px;
   width:100%;
   max-width:400px;
+  border:none;
+  border-radius:15px;
 
 }

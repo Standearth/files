@@ -99,6 +99,7 @@
 
              }
              $('#donform').attr('src',donateurl);
+             $('#footer').prepend('<div id="thankyou_stage3_donate" class="glass"><iframe id="donform" src="" title="Support this campaign"></iframe></div>');
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)
