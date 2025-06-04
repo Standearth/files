@@ -67,6 +67,7 @@
 
 // default donate url
   var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&transaction.paycurrency=USD';    
+  var country = 'Canada';
 
  // catch the engaging networks form submission, and add some custom post-submit
  // behaviour that overrides the default redirect
@@ -93,11 +94,7 @@
              dataLayer.push({ 'event': 'petition-scroll-init' });
              // customize the post-signing messages with the supporter's name
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
-             var country = $('#en__field_supporter_country').val();
-             if (country == 'Canada') {
-              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD'
-
-             }
+             country = $('#en__field_supporter_country').val();
  
              // slide to the next thankyou section
              // (can't use the generic slide function above since this relies on AJAX returning success first)
@@ -271,12 +268,18 @@
         // the donation redirect also needs to happen in a callback to ensure the tracking event completes first
         $('.donate_clicked').removeClass('donate_clicked');
         $(this).addClass('donate_clicked');
+        var monthly = false;
+        if ($(this).hasClass('donate_monthly')) {
+          monthly = true;
+        } else {
+          monthly = false;
+        }
 
         var amt = $(this).html().replace(/\D/g, '');
         dataLayer.push({
           'event': $(this).data('event'),
           'petition-scroll-value': amt,
-          'eventCallback': donate_redirect
+          'eventCallback': donate_redirect(monthly)
         });
 
       } else {
@@ -285,9 +288,22 @@
     }
   });
    
-  function donate_redirect() {
-    location.href = donateurl;
- }
+  function donate_redirect(monthly) {
+    if (monthly) {
+      if (country == 'Canada') {
+        location.href = 'https://act.stand.earth/page/80282/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD';
+      } else {
+        location.href = 'https://act.stand.earth/page/80315/donate/1?chain&xvar=scroll&transaction.paycurrency=USD';
+      }
+    } else {
+      console.log('onetime');
+      if (country == 'Canada') {
+        location.href = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD';
+      } else {
+        location.href = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&transaction.paycurrency=USD';   
+      }
+    }
+   }
    
 });
 })(jQuery);
