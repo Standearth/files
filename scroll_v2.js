@@ -66,7 +66,7 @@
      });
 
 // default donate url
-  var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll';    
+  var donateurl = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&transaction.paycurrency=USD';    
 
  // catch the engaging networks form submission, and add some custom post-submit
  // behaviour that overrides the default redirect
@@ -95,7 +95,7 @@
              $('.firstname_merge').text($('#en__field_supporter_firstName').val());
              var country = $('#en__field_supporter_country').val();
              if (country == 'Canada') {
-              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll'
+              donateurl = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD'
 
              }
  
