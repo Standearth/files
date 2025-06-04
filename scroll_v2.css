@@ -9,7 +9,7 @@
   border : 0px !important;
 }
 
-#thankyou_stage1_yesno, #thankyou_stage2_buttons {
+#thankyou_stage1_yesno, #thankyou_stage2_buttons, #thankyou_stage3_donate {
   display : none;
   padding : 50px 10% 150px 10%;
   min-height : 100vh;
@@ -350,8 +350,8 @@ div.dc_cta {
 
 #donform {
   display: none; /* This hides it and removes it from document flow */
-  width: 80%; /* Example styling */
-  height: 400px; /* Example styling */
-  border: 1px solid #ccc; /* Example styling */
-  margin-top: 20px; /* Example styling */
+  height:520px;
+  width:100%;
+  max-width:400px;
+
 }
