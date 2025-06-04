@@ -48,9 +48,9 @@
 
 #thankyou_stage2_buttons button.share_btn {
   font-weight : normal;
-  min-width : 100px;
-  max-width : 30%;
-  padding : 15px 20px;
+  width:80px;
+  height:80px;
+  padding : 10px;
   border : 1px solid white;
   border-radius : 50px;
   background : rgb(59, 89, 152);
