@@ -289,6 +289,7 @@
    
   function donate_redirect() {
     $('#donform').show();
+    $('#footer').hide();
  }
    
 });
