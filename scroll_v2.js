@@ -4,10 +4,8 @@
  // Some early initialization -- this is normally overridden by the individual petition,
  // but set some generic defaults just in case
     if($('.en__socialShares .en__socialShare--facebook').attr('href'))
-     var blueskyShare = $('.en__socialShares .en__socialShare--bluesky').attr('href') || {
-       message: "Hi, I just signed this petition with Stand.earth: "+ $('.page_title').html() + " at " + window.location.href + ". Will you join me?",
-       showOnMobile: false
-     }
+     var blueskyShare = $('.en__socialShares .en__socialShare--bluesky').attr('href') ||
+       'https://bsky.app/intent/compose?text='+encodeURI("I just signed this petition with Stand.earth: "+ $('.page_title').html() + " at " + window.location.href + ". Will you join me?");
      var whatsappShare = $('.en__socialShares .en__socialShare--whatsapp').attr('href') || {
        message: "Hi, I just signed this petition with Stand.earth: "+ $('.page_title').html() + " at " + window.location.href + ". It would mean a lot to me if you took a moment to add your name. Thanks!",
        showOnMobile: true
@@ -54,7 +52,7 @@
         window.open(twitterShare, 'twShareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         
      } else if ($(this).hasClass('bluesky')) {
-        window.open(blueskyShare, 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0'); 
+        window.open(blueskyShare); 
         
      } else if ($(this).hasClass('whatsapp')) {
         window.open(whatsappShare);
