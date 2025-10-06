@@ -289,16 +289,16 @@
   function donate_redirect(monthly) {
     if (monthly) {
       if (country == 'Canada') {
-        location.href = 'https://act.stand.earth/page/80282/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD&ref='+pageJson.campaignPageId;
+        location.href = 'https://act.stand.earth/page/80282/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD&supporter.appealCode='+pageJson.campaignPageId;
       } else {
-        location.href = 'https://act.stand.earth/page/80315/donate/1?chain&xvar=scroll&transaction.paycurrency=USD&ref='+pageJson.campaignPageId;
+        location.href = 'https://act.stand.earth/page/80315/donate/1?chain&xvar=scroll&transaction.paycurrency=USD&supporter.appealCode='+pageJson.campaignPageId;
       }
     } else {
       console.log('onetime');
       if (country == 'Canada') {
-        location.href = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD&ref='+pageJson.campaignPageId;
+        location.href = 'https://act.stand.earth/page/75220/donate/1?chain&xvar=scroll&transaction.paycurrency=CAD&supporter.appealCode='+pageJson.campaignPageId;
       } else {
-        location.href = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&transaction.paycurrency=USD&ref='+pageJson.campaignPageId;   
+        location.href = 'https://act.stand.earth/page/77077/donate/1?chain&xvar=scroll&transaction.paycurrency=USD&supporter.appealCode='+pageJson.campaignPageId;   
       }
     }
    }
