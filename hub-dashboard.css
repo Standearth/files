@@ -4,80 +4,82 @@
 
    A presentation layer over Engaging Networks' Supporter Hub (page 2).
    Pairs with hub-dashboard.js. Loads on all three hub pages; only page 2
-   gets the dashboard treatment (guarded by the .sehub-on class that the
-   script sets on <body>).
+   gets the dashboard treatment (gated by the .sehub-on class the script
+   sets on <body>).
 
    CASCADE NOTE
    ------------
-   The hub page carries its own <style> block inside the page-builder content,
-   which loads AFTER this file and uses !important liberally. To win without
-   an !important arms race, rules that must beat that block are prefixed with
-   `body.sehub-on` (specificity 0,2,x). Every remaining !important is
-   commented with what it beats. Per project rules, no !important is ever
-   used on a layout property (display/position/width/flex/grid/margin).
+   The hub page carries its own <style> block inside the page-builder
+   content, which loads AFTER this file and uses !important liberally. Rules
+   that must beat it are prefixed with `body.sehub-on` (specificity 0,2,x).
+   Every remaining !important is commented with what it beats. No !important
+   is used on a layout property.
 
    Verified against: captures in ../widgets/ and ../index.html, 2026-08-05
    ============================================================================ */
 
 /* ---------------------------------------------------------------------------
    1. Tokens
-   Palette derived from the live hub page's own custom style block
-   (../index.html) and stand.earth. No invented identity.
-   Contrast ratios below are measured against #ffffff.
+
+   Palette derived from the live hub page's own style block (../index.html)
+   and stand.earth. Contrast ratios are measured against #ffffff.
    --------------------------------------------------------------------------- */
 
 :root {
-  /* Brand — source: .en__hubOverlay__header border + h2 colour, index.html */
-  --sehub-maroon: #5c1a2e;        /* 12.79:1 — primary ink, headings, borders */
-  --sehub-red: #e50b12;           /* 4.79:1 — accent; large text and rules only */
+  /* Brand */
+  --sehub-brand: #5c1a2e;          /* 12.79:1 — primary ink, buttons, headings */
+  --sehub-brand-dark: #46101f;
+  --sehub-brand-tint: #f7eff1;     /* soft maroon wash for highlight tiles */
+  --sehub-red: #e50b12;            /* 4.79:1 — accent; large text and rules */
 
-  /* Derived brand step for chart fills. The maroon itself fails as a data
+  /* Derived brand step for data fills. The maroon itself fails as a chart
      fill (OKLCH L 0.330, chroma 0.097 — it reads near-black and flattens a
      bar chart). This step sits between maroon and Stand red in hue at
      L 0.480 / C 0.169, 7.15:1 vs white. */
   --sehub-data: #a82231;
-  --sehub-data-soft: #f2dfe2;
+  --sehub-data-track: #efdfe2;
 
   /* Ink */
-  --sehub-ink: #2e2325;           /* 15.18:1 — body text */
-  --sehub-ink-2: #5d5356;         /* 7.40:1  — secondary text */
-  --sehub-ink-3: #6e6467;         /* 5.70:1  — muted labels, still AA */
+  --sehub-ink: #2e2325;            /* 15.18:1 */
+  --sehub-ink-2: #5d5356;          /* 7.40:1 */
+  --sehub-ink-3: #6e6467;          /* 5.70:1 — muted labels, still AA */
 
-  /* Surfaces and lines */
+  /* Surfaces */
+  --sehub-page: #faf8f6;
   --sehub-surface: #ffffff;
   --sehub-surface-2: #faf8f8;
   --sehub-surface-3: #f4f0f1;
-  --sehub-border: #ded7d9;
-  --sehub-border-strong: #c9bec1;
-  --sehub-grid: #e6e1e2;
+  --sehub-border: #e3dcde;
+  --sehub-border-2: #cfc5c8;
 
-  /* Status — each ships with an icon and a label in the markup, never colour
-     alone. Ink values are AA against their own tint. */
-  --sehub-warn-bg: #fdf4e3;
-  --sehub-warn-border: #e8c77a;
-  --sehub-warn-ink: #7a4a00;      /* 7.48:1 */
-  --sehub-alert-bg: #fdeeee;
-  --sehub-alert-border: #e8a0a3;
-  --sehub-alert-ink: #8f1520;
+  /* Status. Each ships with an icon and a text label, never colour alone. */
+  --sehub-notice-bg: #fdf4e6;
+  --sehub-notice-border: #edd6ac;
+  --sehub-notice-ink: #7a4a00;     /* 7.48:1 */
+  --sehub-notice-icon: #f3e3c4;
+
+  --sehub-urgent-bg: #fdeeee;
+  --sehub-urgent-border: #e8a8ab;
+  --sehub-urgent-ink: #8f1520;
+
   --sehub-good-bg: #eef6f1;
-  --sehub-good-border: #9ac4ae;
-  --sehub-good-ink: #1d5c3a;      /* 7.94:1 */
+  --sehub-good-border: #b9d8c8;
+  --sehub-good-ink: #1d5c3a;       /* 7.94:1 */
 
-  /* Type — Readex Pro + Roboto are already loaded by the hub page, so this
-     adds no new runtime dependency. System stack is the fallback. */
+  /* Type. Readex Pro + Roboto are already loaded by the hub page, so this
+     adds no new runtime dependency. */
   --sehub-font-head: "Readex Pro", "Helvetica Neue", Arial, sans-serif;
   --sehub-font-body: "Roboto", "Helvetica Neue", Arial, sans-serif;
 
-  /* 16px floor on body text, per the accessibility baseline. */
-  --sehub-text-xs: 0.875rem;      /* 14px — labels only, never prose */
-  --sehub-text-sm: 1rem;          /* 16px */
-  --sehub-text-md: 1.0625rem;     /* 17px — body default */
-  --sehub-text-lg: 1.25rem;
-  --sehub-text-xl: 1.5rem;
-  --sehub-text-2xl: 1.875rem;
-  --sehub-text-hero: 2.75rem;
+  --sehub-t-xs: 0.8125rem;   /* 13px — pills and micro-labels only */
+  --sehub-t-sm: 0.9375rem;   /* 15px — table and meta values */
+  --sehub-t-base: 1rem;      /* 16px — body floor */
+  --sehub-t-md: 1.0625rem;
+  --sehub-t-lg: 1.25rem;
+  --sehub-t-xl: 1.5rem;
+  --sehub-t-2xl: 2rem;
+  --sehub-t-hero: 2.5rem;
 
-  /* Spacing — 4px rhythm */
   --sehub-s1: 0.25rem;
   --sehub-s2: 0.5rem;
   --sehub-s3: 0.75rem;
@@ -86,60 +88,27 @@
   --sehub-s6: 2rem;
   --sehub-s7: 3rem;
 
-  --sehub-radius: 10px;
-  --sehub-radius-sm: 6px;
-  --sehub-shadow: 0 1px 2px rgba(46, 35, 37, 0.06), 0 4px 12px rgba(46, 35, 37, 0.05);
-
-  /* 44px minimum touch target */
-  --sehub-target: 44px;
+  --sehub-r: 12px;
+  --sehub-r-sm: 8px;
+  --sehub-shadow: 0 1px 2px rgba(46, 35, 37, 0.05);
+  --sehub-target: 44px;      /* minimum touch target */
+  --sehub-aside: 340px;
 }
 
 /* ---------------------------------------------------------------------------
    2. Boot cloak
 
-   The wrapper template sets class="sehub-cloak" on <html> from an inline
-   script, so it is never applied when JavaScript is off. It fades the raw
-   gadget column for the few milliseconds between DOMContentLoaded and the
-   script inserting its own skeleton, so donors never see the undifferentiated
-   button row rearrange itself.
+   The wrapper template sets .sehub-cloak on <html> from an inline script, so
+   it is never applied when JavaScript is off. It fades the raw gadget column
+   for the few milliseconds between DOMContentLoaded and the script inserting
+   its own skeleton, so donors never watch the button row rearrange.
 
-   The inline script also removes it on a hard timeout, so a hub-dashboard.js
-   that fails to load or throws before boot cannot leave the page hidden.
+   The inline script removes it on a hard timeout, so a hub-dashboard.js that
+   404s, is blocked by CSP, or throws before boot cannot leave the page
+   hidden.
    --------------------------------------------------------------------------- */
 
-.sehub-cloak #engrid .body-main .en__component--column > * {
-  opacity: 0;
-}
-
-/* Skeletons are inserted by the script, which sets display:block inline. */
-.sehub-skeleton {
-  display: none;
-  padding: var(--sehub-s5) 0;
-}
-
-.sehub-skeleton__bar {
-  height: 14px;
-  border-radius: var(--sehub-radius-sm);
-  background: var(--sehub-surface-3);
-  margin-bottom: var(--sehub-s3);
-  animation: sehub-pulse 1.4s ease-in-out infinite;
-}
-
-.sehub-skeleton__bar--title { width: 45%; height: 26px; }
-.sehub-skeleton__bar--wide  { width: 100%; }
-.sehub-skeleton__bar--mid   { width: 70%; }
-.sehub-skeleton__card {
-  height: 150px;
-  border-radius: var(--sehub-radius);
-  background: var(--sehub-surface-3);
-  margin-bottom: var(--sehub-s4);
-  animation: sehub-pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes sehub-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
+.sehub-cloak #engrid .body-main .en__component--column > * { opacity: 0; }
 
 /* ---------------------------------------------------------------------------
    3. Harvest state
@@ -157,14 +126,13 @@ body.sehub-harvesting .en__hubOverlay {
 }
 
 /* ---------------------------------------------------------------------------
-   4. Gadget buttons
+   4. EN's gadget buttons
 
    Kept in the DOM and kept clickable so EN's own script still finds them and
-   our cards can trigger them. Hidden visually only. aria-hidden is set from
-   JS so screen readers do not meet duplicate controls.
-
-   If boot fails the .sehub-on class is never added and the buttons stay
-   exactly as EN rendered them.
+   our cards can trigger them. Hidden visually only, and taken out of the
+   accessibility tree from JS so donors do not meet every control twice.
+   If boot fails, .sehub-on is never set and the buttons stay exactly as EN
+   rendered them.
    --------------------------------------------------------------------------- */
 
 body.sehub-on .en__component--hubgadget {
@@ -176,77 +144,232 @@ body.sehub-on .en__component--hubgadget {
   white-space: nowrap;
 }
 
+/* Give the dashboard room. The hub page constrains the main column to a
+   single narrow measure, which the two-column layout needs to escape. */
+body.sehub-on #engrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+
+body.sehub-on #engrid .body-main { max-width: none; }
+
+/* The dashboard renders its own top bar with the logo in it, so the
+   template's standalone logo block would be a second one. Hidden on page 2
+   only — pages 1 and 3 never get .sehub-on, so they keep it. */
+body.sehub-on #engrid .logo { display: none; }
+
+/* The hub's full-bleed background image competes with a dense dashboard. */
+body.sehub-on #engrid .page-backgroundImage { display: none; }
+
 /* ---------------------------------------------------------------------------
-   5. Dashboard shell
+   5. Shell and typography
    --------------------------------------------------------------------------- */
+
+body.sehub-on { background: var(--sehub-page); }
 
 .sehub {
   font-family: var(--sehub-font-body);
-  font-size: var(--sehub-text-md);
-  font-weight: 300;
+  font-size: var(--sehub-t-md);
+  font-weight: 400;
   line-height: 1.55;
   color: var(--sehub-ink);
-  margin: var(--sehub-s5) 0 var(--sehub-s6);
   text-align: left;
 }
 
-.sehub *,
-.sehub *::before,
-.sehub *::after {
-  box-sizing: border-box;
-}
+.sehub *, .sehub *::before, .sehub *::after { box-sizing: border-box; }
 
-.sehub h2,
-.sehub h3,
-.sehub h4 {
+.sehub h1, .sehub h2, .sehub h3, .sehub h4 {
   font-family: var(--sehub-font-head);
   font-weight: 600;
-  color: var(--sehub-maroon);
+  color: var(--sehub-ink);
   margin: 0;
   line-height: 1.25;
 }
 
 .sehub p { margin: 0; }
+.sehub ul, .sehub ol { list-style: none; margin: 0; padding: 0; }
 
-/* Section heading with a hairline rule — the rule encodes grouping, which is
-   the only ornament allowed here. */
-.sehub__section {
-  margin-top: var(--sehub-s6);
+.sehub-vh {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.sehub__section-head {
+/* ---------------------------------------------------------------------------
+   6. Top bar
+   --------------------------------------------------------------------------- */
+
+.sehub-topbar {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--sehub-s3);
+  gap: var(--sehub-s4);
   flex-wrap: wrap;
-  padding-bottom: var(--sehub-s2);
+  padding: var(--sehub-s3) 0;
   border-bottom: 1px solid var(--sehub-border);
-  margin-bottom: var(--sehub-s4);
+  margin-bottom: var(--sehub-s6);
 }
 
-.sehub__section-head h2 {
-  font-size: var(--sehub-text-lg);
-  letter-spacing: 0.01em;
+.sehub-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sehub-s3);
+  min-width: 0;
 }
 
-.sehub__section-note {
-  font-size: var(--sehub-text-xs);
+.sehub-brand__mark {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--sehub-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.sehub-brand__mark img { width: 100%; height: 100%; object-fit: contain; }
+.sehub-brand__mark svg { width: 22px; height: 22px; }
+
+.sehub-brand__name {
+  font-family: var(--sehub-font-head);
+  font-weight: 600;
+  font-size: var(--sehub-t-base);
+  color: var(--sehub-ink);
+  line-height: 1.2;
+}
+
+.sehub-brand__tag {
+  font-size: var(--sehub-t-xs);
   color: var(--sehub-ink-3);
+  line-height: 1.3;
+}
+
+.sehub-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+}
+
+.sehub-tblink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+  min-height: var(--sehub-target);
+  padding: 0 var(--sehub-s3);
+  border: 0;
+  border-radius: var(--sehub-r-sm);
+  background: none;
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-ink-2);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sehub-tblink:hover { background: var(--sehub-surface-3); color: var(--sehub-ink); }
+.sehub-tblink svg { width: 18px; height: 18px; }
+
+.sehub-whoami {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+  min-height: var(--sehub-target);
+  padding: var(--sehub-s1) var(--sehub-s3) var(--sehub-s1) var(--sehub-s1);
+  border: 1px solid var(--sehub-border);
+  border-radius: 999px;
+  background: var(--sehub-surface);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-ink);
+}
+
+.sehub-avatar {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--sehub-brand-tint);
+  color: var(--sehub-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sehub-font-head);
+  font-size: var(--sehub-t-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   7. Hero
+   --------------------------------------------------------------------------- */
+
+.sehub-hero { margin-bottom: var(--sehub-s5); }
+
+.sehub-hero h1 {
+  font-size: var(--sehub-t-hero);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--sehub-s2);
+}
+
+.sehub-hero__sub {
+  font-size: var(--sehub-t-md);
+  color: var(--sehub-ink-2);
+}
+
+/* EN's own intro copy block sits directly below the hero, still owned and
+   edited by Fundraising in the page builder. */
+body.sehub-on .sehub-copyblock--intro {
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-base);
+  color: var(--sehub-ink-2);
+  margin-bottom: var(--sehub-s5);
+}
+
+body.sehub-on .sehub-copyblock--intro p { margin: 0 0 var(--sehub-s2); }
+
+/* ---------------------------------------------------------------------------
+   8. Layout
+   --------------------------------------------------------------------------- */
+
+.sehub-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--sehub-aside);
+  gap: var(--sehub-s5);
+  align-items: start;
+}
+
+.sehub-main, .sehub-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sehub-s4);
+  min-width: 0;
 }
 
 .sehub-card {
   background: var(--sehub-surface);
   border: 1px solid var(--sehub-border);
-  border-radius: var(--sehub-radius);
+  border-radius: var(--sehub-r);
   box-shadow: var(--sehub-shadow);
   padding: var(--sehub-s5);
 }
 
-/* ---------------------------------------------------------------------------
-   6. Buttons
+.sehub-section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+  margin: var(--sehub-s3) 0 0;
+}
 
-   Full-size targets, real focus rings. EN's defaults are inadequate here.
+.sehub-section-head h2 { font-size: var(--sehub-t-lg); }
+.sehub-section-head svg { width: 20px; height: 20px; color: var(--sehub-data); }
+
+/* ---------------------------------------------------------------------------
+   9. Buttons
    --------------------------------------------------------------------------- */
 
 .sehub-btn {
@@ -255,298 +378,383 @@ body.sehub-on .en__component--hubgadget {
   justify-content: center;
   gap: var(--sehub-s2);
   min-height: var(--sehub-target);
-  padding: var(--sehub-s3) var(--sehub-s5);
+  padding: var(--sehub-s2) var(--sehub-s4);
   font-family: var(--sehub-font-body);
-  font-size: var(--sehub-text-sm);
+  font-size: var(--sehub-t-sm);
   font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
-  border-radius: var(--sehub-radius-sm);
-  border: 2px solid var(--sehub-maroon);
-  background: var(--sehub-maroon);
+  white-space: nowrap;
+  border-radius: var(--sehub-r-sm);
+  border: 1px solid var(--sehub-brand);
+  background: var(--sehub-brand);
   color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.sehub-btn:hover,
-.sehub-btn:focus-visible {
-  background: #46101f;
-  border-color: #46101f;
+.sehub-btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+.sehub-btn:hover, .sehub-btn:focus-visible {
+  background: var(--sehub-brand-dark);
+  border-color: var(--sehub-brand-dark);
   color: #ffffff;
 }
 
-.sehub-btn--secondary {
-  background: transparent;
-  color: var(--sehub-maroon);
+.sehub-btn--outline {
+  background: var(--sehub-surface);
+  border-color: var(--sehub-border-2);
+  color: var(--sehub-ink);
 }
 
-.sehub-btn--secondary:hover,
-.sehub-btn--secondary:focus-visible {
+.sehub-btn--outline:hover, .sehub-btn--outline:focus-visible {
   background: var(--sehub-surface-3);
-  border-color: var(--sehub-maroon);
-  color: var(--sehub-maroon);
+  border-color: var(--sehub-ink-3);
+  color: var(--sehub-ink);
 }
 
+/* Cancel is a real button with a real label at full target size. It is never
+   made smaller, greyer or lower contrast than the actions beside it — see
+   the no-dark-patterns rule. */
 .sehub-btn--quiet {
-  min-height: 0;
-  padding: var(--sehub-s1) var(--sehub-s2);
+  background: none;
+  border-color: transparent;
+  color: var(--sehub-ink-2);
+}
+
+.sehub-btn--quiet:hover, .sehub-btn--quiet:focus-visible {
+  background: var(--sehub-surface-3);
+  border-color: var(--sehub-border-2);
+  color: var(--sehub-ink);
+}
+
+.sehub-btn--sm { min-height: 36px; padding: var(--sehub-s1) var(--sehub-s3); font-size: var(--sehub-t-xs); }
+
+.sehub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sehub-s1);
+  min-height: 32px;
   border: 0;
   background: none;
-  color: var(--sehub-maroon);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 400;
+  padding: 0;
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-ink-2);
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.sehub-btn--quiet:hover,
-.sehub-btn--quiet:focus-visible {
-  background: none;
-  color: var(--sehub-red);
-}
+.sehub-link:hover { color: var(--sehub-brand); text-decoration: underline; }
+.sehub-link svg { width: 15px; height: 15px; }
 
-/* One visible focus style for everything we add. */
+/* One visible focus style for everything we add, and for EN's overlay. */
 .sehub :focus-visible,
 body.sehub-on .en__hubOverlay :focus-visible {
   outline: 3px solid var(--sehub-red);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 /* ---------------------------------------------------------------------------
-   7. Alert region
-
-   One banner at a time. Every banner carries an icon and a text label, so
-   state is never conveyed by colour alone.
+   10. Banners — alerts and the upgrade offer
    --------------------------------------------------------------------------- */
 
-.sehub-alerts:empty { display: none; }
-
-.sehub-alert {
+.sehub-banner {
   display: flex;
   align-items: flex-start;
   gap: var(--sehub-s3);
-  padding: var(--sehub-s4) var(--sehub-s5);
-  border: 1px solid var(--sehub-border);
-  border-left-width: 5px;
-  border-radius: var(--sehub-radius-sm);
-  margin-bottom: var(--sehub-s4);
-  background: var(--sehub-surface-2);
+  padding: var(--sehub-s4);
+  border: 1px solid var(--sehub-notice-border);
+  border-radius: var(--sehub-r);
+  background: var(--sehub-notice-bg);
 }
 
-.sehub-alert__icon {
+.sehub-banner__icon {
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  margin-top: 2px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-notice-icon);
+  color: var(--sehub-notice-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.sehub-alert__body { flex: 1 1 auto; min-width: 0; }
+.sehub-banner__icon svg { width: 19px; height: 19px; }
+.sehub-banner__body { flex: 1 1 auto; min-width: 0; }
 
-.sehub-alert__label {
-  display: block;
+.sehub-banner__title {
   font-family: var(--sehub-font-head);
   font-weight: 600;
-  font-size: var(--sehub-text-md);
-  margin-bottom: var(--sehub-s1);
+  font-size: var(--sehub-t-md);
+  color: var(--sehub-notice-ink);
+  margin-bottom: 2px;
 }
 
-.sehub-alert__text {
-  font-size: var(--sehub-text-sm);
+.sehub-banner__text {
+  font-size: var(--sehub-t-sm);
   color: var(--sehub-ink-2);
 }
 
-.sehub-alert__action { margin-top: var(--sehub-s3); }
+.sehub-banner__action { flex: 0 0 auto; align-self: center; }
 
-.sehub-alert--info {
-  background: var(--sehub-warn-bg);
-  border-color: var(--sehub-warn-border);
+.sehub-banner--urgent {
+  background: var(--sehub-urgent-bg);
+  border-color: var(--sehub-urgent-border);
 }
-.sehub-alert--info .sehub-alert__label { color: var(--sehub-warn-ink); }
+.sehub-banner--urgent .sehub-banner__icon { background: #f8d7d8; color: var(--sehub-urgent-ink); }
+.sehub-banner--urgent .sehub-banner__title { color: var(--sehub-urgent-ink); }
 
-.sehub-alert--urgent {
-  background: var(--sehub-alert-bg);
-  border-color: var(--sehub-alert-border);
-}
-.sehub-alert--urgent .sehub-alert__label { color: var(--sehub-alert-ink); }
-
-.sehub-alert--good {
-  background: var(--sehub-good-bg);
-  border-color: var(--sehub-good-border);
-}
-.sehub-alert--good .sehub-alert__label { color: var(--sehub-good-ink); }
+.sehub-banner--offer .sehub-banner__title { font-size: var(--sehub-t-lg); }
 
 /* ---------------------------------------------------------------------------
-   8. Gift card — the page's answer to "what is my gift?"
+   11. Gift card
    --------------------------------------------------------------------------- */
 
-.sehub-gift {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sehub-s5);
-  align-items: start;
+.sehub-gift__top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sehub-s4);
 }
 
+.sehub-gift__icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-brand-tint);
+  color: var(--sehub-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sehub-gift__icon svg { width: 22px; height: 22px; }
+.sehub-gift__headline { flex: 1 1 auto; min-width: 0; }
+
 .sehub-gift__label {
-  font-size: var(--sehub-text-xs);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--sehub-ink-3);
-  margin-bottom: var(--sehub-s2);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-ink-2);
+  margin-bottom: 2px;
 }
 
 .sehub-gift__amount {
   font-family: var(--sehub-font-head);
-  font-size: var(--sehub-text-hero);
+  font-size: var(--sehub-t-2xl);
   font-weight: 600;
-  line-height: 1.05;
-  color: var(--sehub-maroon);
+  color: var(--sehub-ink);
   letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .sehub-gift__cadence {
   font-family: var(--sehub-font-body);
-  font-size: var(--sehub-text-lg);
-  font-weight: 300;
+  font-size: var(--sehub-t-md);
+  font-weight: 400;
   color: var(--sehub-ink-2);
 }
 
-.sehub-gift__meta {
-  margin-top: var(--sehub-s4);
+.sehub-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+  padding: var(--sehub-s1) var(--sehub-s3);
+  border-radius: 999px;
+  border: 1px solid var(--sehub-good-border);
+  background: var(--sehub-good-bg);
+  color: var(--sehub-good-ink);
+  font-size: var(--sehub-t-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sehub-pill::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.sehub-pill--muted {
+  border-color: var(--sehub-border-2);
+  background: var(--sehub-surface-3);
+  color: var(--sehub-ink-2);
+}
+
+/* Meta tile grid */
+.sehub-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--sehub-s3);
+  margin-top: var(--sehub-s5);
+}
+
+.sehub-meta__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sehub-s3);
+  padding: var(--sehub-s3);
+  border: 1px solid var(--sehub-border);
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-surface);
+  min-width: 0;
+}
+
+.sehub-meta__icon {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-surface-3);
+  color: var(--sehub-ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sehub-meta__icon svg { width: 16px; height: 16px; }
+.sehub-meta__text { min-width: 0; }
+
+.sehub-meta__label {
+  font-size: var(--sehub-t-xs);
+  color: var(--sehub-ink-3);
+  line-height: 1.3;
+}
+
+.sehub-meta__value {
+  font-size: var(--sehub-t-sm);
+  font-weight: 500;
+  color: var(--sehub-ink);
+  overflow-wrap: break-word;
+}
+
+.sehub-meta__sub { font-size: var(--sehub-t-xs); color: var(--sehub-ink-3); }
+
+.sehub-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sehub-s2) var(--sehub-s5);
-}
-
-.sehub-gift__meta-item {
-  font-size: var(--sehub-text-sm);
-  color: var(--sehub-ink-2);
-}
-
-.sehub-gift__meta-item strong {
-  display: block;
-  font-size: var(--sehub-text-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--sehub-ink-3);
-}
-
-.sehub-gift__actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sehub-s3);
-  align-items: stretch;
-}
-
-/* Dormant / no-gift variants lead with the invitation, not a number. */
-.sehub-gift--dormant .sehub-gift__amount,
-.sehub-gift--none .sehub-gift__amount {
-  font-size: var(--sehub-text-2xl);
+  gap: var(--sehub-s2);
+  margin-top: var(--sehub-s5);
+  padding-top: var(--sehub-s4);
+  border-top: 1px solid var(--sehub-border);
 }
 
 /* ---------------------------------------------------------------------------
-   9. Stat tiles
-
-   Numbers, not charts. A single value belongs in a tile.
+   12. Impact tiles
    --------------------------------------------------------------------------- */
 
-.sehub-stats {
+.sehub-impact {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--sehub-s4);
-  margin-top: var(--sehub-s4);
 }
 
-.sehub-stat {
-  background: var(--sehub-surface-2);
+.sehub-tile {
+  background: var(--sehub-surface);
   border: 1px solid var(--sehub-border);
-  border-radius: var(--sehub-radius);
+  border-radius: var(--sehub-r);
   padding: var(--sehub-s4) var(--sehub-s5);
+  box-shadow: var(--sehub-shadow);
 }
 
-.sehub-stat__label {
-  font-size: var(--sehub-text-xs);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sehub-ink-3);
-  margin-bottom: var(--sehub-s2);
+.sehub-tile--highlight {
+  background: var(--sehub-brand-tint);
+  border-color: #e6d3d8;
 }
 
-.sehub-stat__value {
+.sehub-tile__label { font-size: var(--sehub-t-sm); color: var(--sehub-ink-2); }
+
+.sehub-tile__value {
   font-family: var(--sehub-font-head);
-  font-size: var(--sehub-text-xl);
+  font-size: var(--sehub-t-2xl);
   font-weight: 600;
-  color: var(--sehub-maroon);
+  color: var(--sehub-ink);
+  letter-spacing: -0.02em;
   line-height: 1.15;
-}
-
-.sehub-stat__value + .sehub-stat__value { margin-top: var(--sehub-s1); }
-
-.sehub-stat__sub {
-  font-size: var(--sehub-text-xs);
-  color: var(--sehub-ink-3);
   margin-top: var(--sehub-s1);
 }
 
-/* ---------------------------------------------------------------------------
-   10. Giving-by-year chart
+.sehub-tile__value + .sehub-tile__value { font-size: var(--sehub-t-lg); }
 
-   Single series, so one hue and no legend — the heading names the series.
-   Grid and axes recessive; values labelled selectively (hover plus the
-   largest bar), never a number on every bar.
+.sehub-tile__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sehub-s2);
+  margin-top: var(--sehub-s3);
+  font-size: var(--sehub-t-xs);
+  color: var(--sehub-ink-2);
+}
+
+.sehub-tile__note-icon {
+  flex: 0 0 auto;
+  width: 26px; height: 26px;
+  border-radius: var(--sehub-r-sm);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--sehub-data);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sehub-tile__note-icon svg { width: 15px; height: 15px; }
+
+/* Goal meter — a single ratio against a limit, drawn as a ring with an
+   explicit track. The figure is printed in the centre and both values are
+   spelled out beside it, so the number never depends on reading an arc. */
+.sehub-goal { display: flex; align-items: center; gap: var(--sehub-s4); margin-top: var(--sehub-s3); }
+.sehub-goal__text { flex: 1 1 auto; font-size: var(--sehub-t-xs); color: var(--sehub-ink-2); }
+.sehub-goal__text strong { font-weight: 500; color: var(--sehub-ink); }
+.sehub-meter { flex: 0 0 auto; width: 78px; height: 78px; }
+.sehub-meter__track { fill: none; stroke: var(--sehub-data-track); }
+.sehub-meter__fill { fill: none; stroke: var(--sehub-data); stroke-linecap: round; }
+.sehub-meter__label {
+  font-family: var(--sehub-font-head);
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--sehub-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   13. Chart — giving over the last 12 months
+
+   One series, so one hue and no legend: the card heading names the series.
+   Grid recessive, values labelled selectively rather than on every bar, 4px
+   rounded data-ends anchored to the baseline, 2px gap between fills. A table
+   view is always available, so the data never depends on colour.
    --------------------------------------------------------------------------- */
 
-.sehub-chart { margin-top: var(--sehub-s5); }
-
-.sehub-chart__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
+.sehub-cardhead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sehub-s3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sehub-s4);
 }
+
+.sehub-cardhead h2, .sehub-cardhead h3 { font-size: var(--sehub-t-lg); }
+.sehub-cardhead__sub { font-size: var(--sehub-t-sm); color: var(--sehub-ink-2); margin-top: 2px; }
+
+.sehub-chart__wrap { position: relative; }
+
+.sehub-chart__svg { display: block; width: 100%; height: auto; overflow: visible; }
 
 .sehub-chart__grid line {
-  stroke: var(--sehub-grid);
+  stroke: var(--sehub-border);
   stroke-width: 1;
   shape-rendering: crispEdges;
 }
 
-.sehub-chart__baseline {
-  stroke: var(--sehub-border-strong);
-  stroke-width: 1;
-  shape-rendering: crispEdges;
-}
-
-.sehub-chart__bar {
-  fill: var(--sehub-data);
-  transition: fill 0.12s ease;
-}
-
-.sehub-chart__hit { fill: transparent; cursor: default; }
+.sehub-chart__bar { fill: var(--sehub-data); transition: fill 0.12s ease; }
 
 /* Hit areas are pointer-only and aria-hidden; keyboard and screen-reader
    users get the table view rather than one tab stop per bar. */
-.sehub-chart__hit:hover + .sehub-chart__bar {
-  fill: var(--sehub-maroon);
-}
+.sehub-chart__hit { fill: transparent; }
+.sehub-chart__hit:hover + .sehub-chart__bar { fill: var(--sehub-brand); }
 
 /* Axis and value text wear ink tokens, never the series colour. */
-.sehub-chart__tick {
-  font-family: var(--sehub-font-body);
-  font-size: 12px;
-  fill: var(--sehub-ink-3);
-}
-
-.sehub-chart__value {
-  font-family: var(--sehub-font-head);
-  font-size: 12px;
-  font-weight: 600;
-  fill: var(--sehub-ink-2);
-}
+.sehub-chart__tick { font-family: var(--sehub-font-body); font-size: 12px; fill: var(--sehub-ink-3); }
+.sehub-chart__value { font-family: var(--sehub-font-head); font-size: 12px; font-weight: 600; fill: var(--sehub-ink-2); }
 
 .sehub-chart__tip {
   position: absolute;
@@ -554,134 +762,84 @@ body.sehub-on .en__hubOverlay :focus-visible {
   pointer-events: none;
   background: var(--sehub-ink);
   color: #ffffff;
-  font-size: var(--sehub-text-xs);
+  font-size: var(--sehub-t-xs);
   line-height: 1.4;
   padding: var(--sehub-s2) var(--sehub-s3);
-  border-radius: var(--sehub-radius-sm);
+  border-radius: var(--sehub-r-sm);
   white-space: nowrap;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, -125%);
   opacity: 0;
   transition: opacity 0.1s ease;
 }
 
 .sehub-chart__tip[data-visible="true"] { opacity: 1; }
 
-.sehub-chart__wrap { position: relative; }
+/* ---------------------------------------------------------------------------
+   14. Giving history table
+   --------------------------------------------------------------------------- */
 
-/* Table view — always available, so identity never depends on the chart. */
-.sehub-table-toggle { margin-top: var(--sehub-s3); }
+.sehub-tablewrap { overflow-x: auto; }
 
 .sehub-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: var(--sehub-s3);
-  font-size: var(--sehub-text-sm);
+  font-size: var(--sehub-t-sm);
 }
 
 .sehub-table caption {
   text-align: left;
-  font-size: var(--sehub-text-xs);
+  font-size: var(--sehub-t-xs);
   color: var(--sehub-ink-3);
   padding-bottom: var(--sehub-s2);
 }
 
-.sehub-table th,
-.sehub-table td {
+.sehub-table th, .sehub-table td {
   text-align: left;
-  padding: var(--sehub-s2) var(--sehub-s3);
+  padding: var(--sehub-s3);
   border-bottom: 1px solid var(--sehub-border);
-}
-
-.sehub-table th {
-  font-weight: 500;
-  color: var(--sehub-ink-2);
-}
-
-.sehub-table td:last-child,
-.sehub-table th:last-child { text-align: right; }
-
-[hidden] { display: none !important; } /* beats .sehub display rules above */
-
-/* ---------------------------------------------------------------------------
-   11. Giving history list
-   --------------------------------------------------------------------------- */
-
-.sehub-history { margin-top: var(--sehub-s5); }
-
-.sehub-history__year {
-  font-family: var(--sehub-font-head);
-  font-size: var(--sehub-text-sm);
-  font-weight: 600;
-  color: var(--sehub-ink-3);
-  letter-spacing: 0.06em;
-  padding: var(--sehub-s4) 0 var(--sehub-s2);
-  border-bottom: 1px solid var(--sehub-border);
-}
-
-.sehub-history__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.sehub-history__item {
-  display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
-  gap: var(--sehub-s3);
-  align-items: baseline;
-  padding: var(--sehub-s3) 0;
-  border-bottom: 1px solid var(--sehub-grid);
-}
-
-.sehub-history__date {
-  font-size: var(--sehub-text-sm);
-  color: var(--sehub-ink-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.sehub-history__what { font-size: var(--sehub-text-sm); }
-
-.sehub-history__method {
-  display: block;
-  font-size: var(--sehub-text-xs);
-  color: var(--sehub-ink-3);
-}
-
-.sehub-history__amount {
-  font-family: var(--sehub-font-head);
-  font-weight: 600;
-  font-size: var(--sehub-text-sm);
-  color: var(--sehub-ink);
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.sehub-tag {
-  display: inline-block;
-  font-size: var(--sehub-text-xs);
+.sehub-table thead th {
   font-weight: 500;
-  padding: 1px var(--sehub-s2);
-  border-radius: 999px;
-  border: 1px solid var(--sehub-border-strong);
-  color: var(--sehub-ink-2);
-  background: var(--sehub-surface-2);
-  margin-left: var(--sehub-s2);
+  font-size: var(--sehub-t-xs);
+  color: var(--sehub-ink-3);
+  border-bottom-color: var(--sehub-border-2);
 }
 
-.sehub-tag--recurring {
-  border-color: var(--sehub-data);
-  color: var(--sehub-data);
-  background: var(--sehub-data-soft);
+.sehub-table tbody th { font-weight: 400; color: var(--sehub-ink); }
+.sehub-table tbody tr:last-child td,
+.sehub-table tbody tr:last-child th { border-bottom: 0; }
+
+.sehub-table__num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.sehub-table__end { text-align: right; }
+.sehub-table__muted { color: var(--sehub-ink-2); }
+
+.sehub-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sehub-target);
+  height: var(--sehub-target);
+  border: 0;
+  border-radius: var(--sehub-r-sm);
+  background: none;
+  color: var(--sehub-ink-2);
+  cursor: pointer;
+  text-decoration: none;
 }
+
+.sehub-iconbtn:hover { background: var(--sehub-surface-3); color: var(--sehub-brand); }
+.sehub-iconbtn svg { width: 18px; height: 18px; }
 
 /* Progress line for the background history crawl. */
 .sehub-progress {
   display: flex;
   align-items: center;
   gap: var(--sehub-s3);
-  font-size: var(--sehub-text-xs);
+  font-size: var(--sehub-t-xs);
   color: var(--sehub-ink-3);
-  padding: var(--sehub-s3) 0;
+  padding: var(--sehub-s3) 0 0;
 }
 
 .sehub-progress__track {
@@ -701,89 +859,107 @@ body.sehub-on .en__hubOverlay :focus-visible {
 }
 
 /* ---------------------------------------------------------------------------
-   12. Two-up cards: details and preferences
+   15. Sidebar
    --------------------------------------------------------------------------- */
 
-.sehub-grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--sehub-s4);
-}
+.sehub-aside .sehub-card { padding: var(--sehub-s4) var(--sehub-s5); }
 
-.sehub-card__head {
+.sehub-aside__head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sehub-s3);
-  margin-bottom: var(--sehub-s4);
+  margin-bottom: var(--sehub-s3);
 }
 
-.sehub-card__head h3 { font-size: var(--sehub-text-md); }
+.sehub-aside__head h2, .sehub-aside__head h3 { font-size: var(--sehub-t-md); }
 
-.sehub-deflist {
-  margin: 0;
-  font-size: var(--sehub-text-sm);
-}
+.sehub-idlist { display: flex; flex-direction: column; gap: var(--sehub-s3); }
 
-.sehub-deflist dt {
-  font-size: var(--sehub-text-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--sehub-ink-3);
-  margin-top: var(--sehub-s3);
-}
-
-.sehub-deflist dt:first-child { margin-top: 0; }
-
-.sehub-deflist dd {
-  margin: 0;
+.sehub-idlist li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sehub-s3);
+  font-size: var(--sehub-t-sm);
   color: var(--sehub-ink);
-  overflow-wrap: break-word;
+  min-width: 0;
 }
 
-.sehub-prefs {
-  list-style: none;
-  margin: 0 0 var(--sehub-s4);
-  padding: 0;
-  font-size: var(--sehub-text-sm);
-}
+.sehub-idlist svg { flex: 0 0 auto; width: 17px; height: 17px; color: var(--sehub-ink-3); margin-top: 3px; }
+.sehub-idlist span { min-width: 0; overflow-wrap: break-word; }
+
+.sehub-rule { border: 0; border-top: 1px solid var(--sehub-border); margin: var(--sehub-s4) 0; }
+
+.sehub-prefs { display: flex; flex-direction: column; gap: var(--sehub-s2); }
 
 .sehub-prefs li {
   display: flex;
   align-items: flex-start;
   gap: var(--sehub-s3);
-  padding: var(--sehub-s2) 0;
-  border-bottom: 1px solid var(--sehub-grid);
+  font-size: var(--sehub-t-sm);
 }
 
-.sehub-prefs li:last-child { border-bottom: 0; }
-
-/* Tick and cross glyphs, plus the "On"/"Off" text next to them — state is
-   never carried by colour alone. */
-.sehub-prefs__mark {
-  flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-}
-
+.sehub-prefs__mark { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 3px; }
 .sehub-prefs__mark--on { color: var(--sehub-good-ink); }
 .sehub-prefs__mark--off { color: var(--sehub-ink-3); }
 
-.sehub-prefs__state {
-  flex: 0 0 auto;
-  font-size: var(--sehub-text-xs);
-  font-weight: 500;
+.sehub-prefs__name { min-width: 0; }
+
+/* An off preference is struck through AND carries a text state, so it never
+   reads as off by colour alone. */
+.sehub-prefs li[data-on="false"] .sehub-prefs__name {
+  text-decoration: line-through;
   color: var(--sehub-ink-3);
-  margin-left: auto;
-  padding-left: var(--sehub-s3);
 }
 
-.sehub-prefs__name { flex: 1 1 auto; min-width: 0; }
+/* Help card. The contact details inside it are EN's own page-builder copy
+   block, relocated here so Fundraising can still edit them without a deploy.
+   No staff member's name appears in this stylesheet or in the script. */
+.sehub-help { background: var(--sehub-brand-tint); border-color: #e6d3d8; }
+.sehub-help h2 { font-size: var(--sehub-t-md); margin-bottom: var(--sehub-s3); }
+
+body.sehub-on .sehub-copyblock--help {
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-ink-2);
+  line-height: 1.55;
+}
+
+body.sehub-on .sehub-copyblock--help p { margin: 0 0 var(--sehub-s2); }
+body.sehub-on .sehub-copyblock--help a { color: var(--sehub-brand); }
+body.sehub-on .sehub-copyblock--help strong { color: var(--sehub-ink); font-weight: 500; }
+
+.sehub-help__hours {
+  display: flex;
+  align-items: center;
+  gap: var(--sehub-s2);
+  margin-top: var(--sehub-s3);
+  font-size: var(--sehub-t-xs);
+  color: var(--sehub-ink-2);
+}
+
+.sehub-help__hours svg { width: 15px; height: 15px; }
+
+/* Logout copy block, last. */
+body.sehub-on .sehub-copyblock--logout { margin-top: var(--sehub-s6); text-align: right; }
+
+body.sehub-on .sehub-copyblock--logout a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--sehub-target);
+  padding: var(--sehub-s2) var(--sehub-s5);
+  border: 1px solid var(--sehub-border-2);
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-surface);
+  color: var(--sehub-ink);
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-sm);
+  font-weight: 500;
+  text-decoration: none;
+}
 
 /* ---------------------------------------------------------------------------
-   13. Stale notice — shown after the donor completes an EN update, because we
+   16. Stale notice — shown after the donor completes an EN update, because we
    deliberately do not re-open the gift panel to re-read it.
    --------------------------------------------------------------------------- */
 
@@ -794,75 +970,62 @@ body.sehub-on .en__hubOverlay :focus-visible {
   flex-wrap: wrap;
   margin-top: var(--sehub-s4);
   padding: var(--sehub-s3) var(--sehub-s4);
-  border: 1px dashed var(--sehub-border-strong);
-  border-radius: var(--sehub-radius-sm);
-  background: var(--sehub-surface-2);
-  font-size: var(--sehub-text-sm);
-  color: var(--sehub-ink-2);
+  border: 1px solid var(--sehub-good-border);
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-good-bg);
+  font-size: var(--sehub-t-sm);
+  color: var(--sehub-good-ink);
 }
 
 /* ---------------------------------------------------------------------------
-   14. Restyling EN's own markup
-
-   Pure CSS, no structural change. These rules must beat the page's inline
-   style block, hence the body.sehub-on prefix.
+   17. Skeletons
    --------------------------------------------------------------------------- */
 
-/* The greeting, contact and logout copyblocks stay where EN put them and stay
-   staff-editable in the page builder. We only give them card framing. The
-   dashboard is inserted before the first gadget, which puts the reading order
-   at greeting -> dashboard -> contact -> logout with no DOM reordering. */
-body.sehub-on #engrid .body-main .en__component--copyblock {
-  font-family: var(--sehub-font-body);
-  font-size: var(--sehub-text-md);
-  line-height: 1.6;
-  color: var(--sehub-ink);
+.sehub-skeleton { display: none; }
+.sehub-skeleton[data-show] { display: block; }
+
+.sehub-skeleton__bar {
+  height: 14px;
+  border-radius: var(--sehub-r-sm);
+  background: var(--sehub-surface-3);
+  margin-bottom: var(--sehub-s3);
+  animation: sehub-pulse 1.4s ease-in-out infinite;
 }
 
-body.sehub-on .sehub-copyblock--intro {
-  margin-bottom: var(--sehub-s5);
+.sehub-skeleton__bar--title { width: 40%; height: 24px; }
+.sehub-skeleton__bar--wide { width: 100%; }
+.sehub-skeleton__bar--mid { width: 65%; }
+
+@keyframes sehub-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-body.sehub-on .sehub-copyblock--intro p:first-child {
-  font-family: var(--sehub-font-head);
-  font-size: var(--sehub-text-2xl);
-  font-weight: 600;
-  color: var(--sehub-maroon);
-  line-height: 1.2;
-  margin-bottom: var(--sehub-s2);
-}
+/* ---------------------------------------------------------------------------
+   18. Restyling EN's overlay
 
-body.sehub-on .sehub-copyblock--help {
-  background: var(--sehub-surface-2);
-  border: 1px solid var(--sehub-border);
-  border-radius: var(--sehub-radius);
-  padding: var(--sehub-s5);
-  margin-top: var(--sehub-s6);
-}
+   Pure CSS, no structural change. This is where every donor action still
+   happens — we never reimplement a submit. Rules here must beat the page's
+   inline style block, hence body.sehub-on.
+   --------------------------------------------------------------------------- */
 
-body.sehub-on .sehub-copyblock--help a { color: var(--sehub-maroon); }
-
-body.sehub-on .sehub-copyblock--logout { margin-top: var(--sehub-s5); }
-
-/* EN's overlay, restyled to match the dashboard. This is where every donor
-   action still happens — we never reimplement a submit. */
 body.sehub-on .en__hubOverlay__popup {
-  border-radius: var(--sehub-radius);
+  border-radius: var(--sehub-r);
   box-shadow: 0 8px 40px rgba(46, 35, 37, 0.25);
   overflow: hidden;
 }
 
 body.sehub-on .en__hubOverlay__header {
-  background: var(--sehub-surface-2) !important;  /* beats page block's #fff */
-  border-bottom-color: var(--sehub-border) !important; /* beats its 2px maroon */
+  background: var(--sehub-surface-2) !important;        /* beats page block's #fff */
+  border-bottom-color: var(--sehub-border) !important;  /* beats its 2px maroon */
   padding: var(--sehub-s4) var(--sehub-s5);
 }
 
 body.sehub-on .en__hubOverlay__header h2 {
   font-family: var(--sehub-font-head);
-  font-size: var(--sehub-text-lg);
+  font-size: var(--sehub-t-lg);
   font-weight: 600;
-  color: var(--sehub-maroon) !important;  /* beats page block's colour rule */
+  color: var(--sehub-brand) !important;                 /* beats its colour rule */
   line-height: 1.3;
 }
 
@@ -872,15 +1035,15 @@ body.sehub-on .en__hubOverlay__header a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--sehub-maroon);
-  font-size: var(--sehub-text-sm);
+  color: var(--sehub-brand);
+  font-size: var(--sehub-t-sm);
   font-weight: 500;
 }
 
 body.sehub-on .en__hubOverlay__content { padding: var(--sehub-s5); }
 
 body.sehub-on .en__hubOverlay .en__field__label {
-  font-size: var(--sehub-text-sm);
+  font-size: var(--sehub-t-sm);
   font-weight: 500;
   color: var(--sehub-ink-2);
 }
@@ -890,67 +1053,205 @@ body.sehub-on .en__hubOverlay .en__field__input--text,
 body.sehub-on .en__hubOverlay .en__field__input--select,
 body.sehub-on .en__hubOverlay .en__field__input--vgs {
   min-height: var(--sehub-target);
-  font-size: var(--sehub-text-sm);
-  border-radius: var(--sehub-radius-sm);
-  border: 1px solid var(--sehub-border-strong);
+  font-size: var(--sehub-t-sm);
+  border-radius: var(--sehub-r-sm);
+  border: 1px solid var(--sehub-border-2);
 }
 
 body.sehub-on .en__hubOverlay .en__button,
 body.sehub-on .en__hubOverlay [data-action="update"] {
   min-height: var(--sehub-target);
-  padding: var(--sehub-s3) var(--sehub-s5);
+  padding: var(--sehub-s2) var(--sehub-s5);
   font-family: var(--sehub-font-body);
-  font-size: var(--sehub-text-sm);
+  font-size: var(--sehub-t-sm);
   font-weight: 500;
-  border-radius: var(--sehub-radius-sm);
-  border: 2px solid var(--sehub-maroon);
-  background: var(--sehub-maroon);
+  border-radius: var(--sehub-r-sm);
+  border: 1px solid var(--sehub-brand);
+  background: var(--sehub-brand);
   color: #ffffff;
   cursor: pointer;
 }
 
 body.sehub-on .en__hubOverlay .en__button--close {
-  background: transparent;
-  color: var(--sehub-maroon);
+  background: var(--sehub-surface);
+  border-color: var(--sehub-border-2);
+  color: var(--sehub-ink);
 }
 
 /* ---------------------------------------------------------------------------
-   15. Responsive — single column below 768px, no horizontal scroll
+   19. Footer
+
+   Scoped to body.sehub-branded, which the script sets on all three hub pages
+   — so login, hub and logout share one footer treatment.
+
+   These rules deliberately target the class names the existing Stand footer
+   already uses (.sub-content, .content, .cta-finance, .footer-social,
+   .footer-nav, .ftr-link). That means the footer is restyled whether you
+   paste the three lines into your current template or rebuild it from
+   hub-wrapper-template.html — the markup does not have to change for the
+   styling to land.
+
+   The charity registration and Canadian tax-receipt paragraphs are legal
+   copy. They are restyled, never restructured or trimmed.
    --------------------------------------------------------------------------- */
+
+body.sehub-branded #footer {
+  background: var(--sehub-brand);
+  color: #f3e7ea;
+  font-family: var(--sehub-font-body);
+  font-size: var(--sehub-t-sm);
+  line-height: 1.6;
+  margin-top: var(--sehub-s7);
+  padding: var(--sehub-s7) var(--sehub-s5);
+}
+
+body.sehub-branded #footer .sub-content,
+body.sehub-branded #footer .content {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+body.sehub-branded #footer img { max-width: 100%; height: auto; }
+
+body.sehub-branded #footer p {
+  color: #e6d2d7;
+  font-size: var(--sehub-t-sm);
+  margin: 0 auto var(--sehub-s4);
+  max-width: 780px;
+}
+
+body.sehub-branded #footer a { color: #ffffff; text-decoration: underline; text-underline-offset: 3px; }
+body.sehub-branded #footer a:hover { color: #ffd7dc; }
+
+/* Programme-spend stat, framed as a single fact rather than an ornament. */
+body.sehub-branded #footer .cta-finance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sehub-s4);
+  flex-wrap: wrap;
+  max-width: 520px;
+  margin: var(--sehub-s6) auto;
+  padding: var(--sehub-s4) var(--sehub-s5);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--sehub-r);
+  text-align: left;
+}
+
+body.sehub-branded #footer .cta-finance .chart img { width: 56px; height: 56px; }
+
+body.sehub-branded #footer .cta-finance h3 {
+  font-family: var(--sehub-font-head);
+  font-size: var(--sehub-t-base);
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 var(--sehub-s1);
+  line-height: 1.35;
+}
+
+body.sehub-branded #footer .footer-social {
+  display: flex;
+  justify-content: center;
+  gap: var(--sehub-s2);
+  list-style: none;
+  margin: var(--sehub-s5) 0;
+  padding: 0;
+}
+
+/* 44px targets — the live footer's icons are well under that. */
+body.sehub-branded #footer .footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sehub-target);
+  height: var(--sehub-target);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+body.sehub-branded #footer .footer-social a:hover { background: rgba(255, 255, 255, 0.12); }
+body.sehub-branded #footer .footer-social img { width: 18px; height: 18px; }
+
+/* Third-party rating badges sit on white so they stay legible on maroon. */
+body.sehub-branded #footer .sehub-footer__badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sehub-s3);
+  flex-wrap: wrap;
+  margin: var(--sehub-s5) 0;
+}
+
+body.sehub-branded #footer .sehub-footer__badges a {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sehub-s2) var(--sehub-s3);
+  background: #ffffff;
+  border-radius: var(--sehub-r-sm);
+}
+
+body.sehub-branded #footer .footer-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sehub-s2) var(--sehub-s4);
+  flex-wrap: wrap;
+  margin-top: var(--sehub-s5);
+  padding-top: var(--sehub-s5);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: var(--sehub-t-xs);
+  /* The live markup separates these links with literal "|" characters.
+     Hiding the pipes is not possible without touching the markup, so the
+     gap above simply gives them room. */
+}
+
+body.sehub-branded #footer .footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  text-decoration: none;
+}
+
+body.sehub-branded #footer .footer-nav a:hover { text-decoration: underline; }
+
+@media (max-width: 767px) {
+  body.sehub-branded #footer { padding: var(--sehub-s6) var(--sehub-s4); }
+  body.sehub-branded #footer .cta-finance { justify-content: flex-start; }
+}
+
+/* ---------------------------------------------------------------------------
+   20. Responsive
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .sehub-layout { grid-template-columns: minmax(0, 1fr); }
+  /* Details and help move below the main column, after the giving history. */
+}
 
 @media (max-width: 767px) {
   :root {
-    --sehub-text-hero: 2.25rem;
-    --sehub-text-2xl: 1.5rem;
+    --sehub-t-hero: 1.875rem;
+    --sehub-t-2xl: 1.625rem;
   }
 
-  .sehub-gift {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sehub-gift__actions { width: 100%; }
-  .sehub-gift__actions .sehub-btn { width: 100%; }
-
-  .sehub-history__item {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .sehub-history__date {
-    grid-column: 1 / -1;
-    order: -1;
-  }
-
+  .sehub-topbar { padding-bottom: var(--sehub-s4); }
+  .sehub-brand__tag { display: none; }
   .sehub-card { padding: var(--sehub-s4); }
+  .sehub-actions .sehub-btn { flex: 1 1 auto; }
+  .sehub-banner { flex-wrap: wrap; }
+  .sehub-banner__action { width: 100%; }
+  .sehub-banner__action .sehub-btn { width: 100%; }
+  .sehub-goal { flex-direction: row-reverse; justify-content: flex-end; }
 }
 
 /* ---------------------------------------------------------------------------
-   16. Motion, print and forced colours
+   21. Motion, print, forced colours
    --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .sehub *,
-  .sehub-skeleton__bar,
-  .sehub-skeleton__card {
+  .sehub *, .sehub-skeleton__bar {
     animation: none !important;      /* beats the pulse keyframes above */
     transition: none !important;     /* beats the transitions above */
     scroll-behavior: auto !important;
@@ -958,23 +1259,15 @@ body.sehub-on .en__hubOverlay .en__button--close {
 }
 
 @media (forced-colors: active) {
-  .sehub-card,
-  .sehub-alert,
-  .sehub-stat {
+  .sehub-card, .sehub-tile, .sehub-banner, .sehub-meta__item {
     border: 1px solid CanvasText;
   }
-
-  .sehub-chart__bar { fill: CanvasText; }
+  .sehub-chart__bar, .sehub-meter__fill { fill: CanvasText; stroke: CanvasText; }
 }
 
 @media print {
-  .sehub-gift__actions,
-  .sehub-btn,
-  .sehub-progress { display: none; }
-
-  .sehub-card {
-    box-shadow: none;
-    border: 1px solid #999;
-    break-inside: avoid;
-  }
+  .sehub-topbar__actions, .sehub-actions, .sehub-btn, .sehub-progress,
+  .sehub-banner__action { display: none; }
+  .sehub-layout { grid-template-columns: minmax(0, 1fr); }
+  .sehub-card, .sehub-tile { box-shadow: none; border: 1px solid #999; break-inside: avoid; }
 }
