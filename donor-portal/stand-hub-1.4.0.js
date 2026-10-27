@@ -1,5 +1,5 @@
 /* =====================================================================
-   STAND HUB WRAPPER: SCRIPT (v1.3.3)
+   STAND HUB WRAPPER: SCRIPT (v1.4.0)
 
    What it does: reads EN's own Hub data (same-origin JSON), draws the dashboard,
    and drives EN's own gadget controls. Every change is still made by EN.
