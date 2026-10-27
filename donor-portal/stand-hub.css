@@ -1,0 +1,382 @@
+/* =====================================================================
+   STAND HUB WRAPPER: STYLES (v1.3.3)
+   Every rule is scoped to body.stand-hub, which the header adds unless the
+   kill switch is on (?standhub=off), so turning the wrapper off returns the
+   Hub to EN's own look.
+
+   Contents
+     1. Tokens (brand colours)      9. EN popups: shell, fields, headings
+     2. Base (type, focus, helpers)            10. EN popups: amount chips, gift form modes
+     3. Page frame (top bar, column, greeting) 11. EN popups: give-once / start-monthly form
+     4. Buttons and links                      12. EN popups: communication preferences
+     5. Dashboard layout and cards             13. Login and logout pages
+     6. Banners and notices                    14. Stand footer fixes
+     7. Giving summary and history             15. Motion
+     8. Wrapper dialog
+   Rules: banners red, marigold, black or teal only (never cream); buttons red, teal on
+   hover; Readex Pro headings, Roboto body; WCAG 2.2 AA. Light mode only (dark mode removed in v1.2.16).
+   ===================================================================== */
+
+/* ---------- 1. Tokens ---------- */
+body.stand-hub {
+  --sh-red: #E50B12; --sh-teal: #00857D; --sh-marigold: #F09914; --sh-black: #101012; --sh-light: #F5F4ED; --sh-wine: #5C1A2E;
+  --sh-bg: #FFFFFF; --sh-surface: #F5F4ED; --sh-text: #101012; --sh-border: #DDDBD0; --sh-control: #101012; --sh-focus: #101012;
+  --sh-chip-bg: #101012; --sh-chip-text: #FFFFFF; --sh-error-text: #E50B12; --sh-success-bg: #E5F3F2; --sh-hover: #E7E7E8; --sh-overlay: rgba(16, 16, 18, .75);
+  --sh-font-head: "Readex Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sh-font-body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sh-body-weight: 300;
+  --sh-topbar-h: 61px; /* the script sets the real height */
+}
+
+/* ---------- 2. Base ---------- */
+body.stand-hub .body-main { background: var(--sh-bg) !important; color: var(--sh-text) !important; font-family: var(--sh-font-body); font-weight: var(--sh-body-weight); }
+body.stand-hub .body-main h1, body.stand-hub .body-main h2, body.stand-hub .body-main h3,
+body.stand-hub .en__hubOverlay h2, body.stand-hub .en__hubOverlay h3 { font-family: var(--sh-font-head); line-height: 1.2; }
+body.stand-hub .body-main a { color: var(--sh-text) !important; text-decoration: underline; }
+body.stand-hub .body-main .en__component--copyblock h1 { font-size: clamp(28px, 4vw, 40px) !important; line-height: 1.2 !important; } /* one heading scale, EN's own h1s included */
+body.stand-hub .body-main .en__component--copyblock h1 [style*="font-size"] { font-size: inherit !important; }
+body.stand-hub :focus-visible { outline: 3px solid var(--sh-focus); outline-offset: 3px; }
+body.stand-hub .sh-sr-only {
+  position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important;
+  overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; font-size: 1px !important;
+}
+body.stand-hub .sh-hidden { display: none !important; }
+body.stand-hub .body-main .en__component--copyblock :is(p, h1, h2, h3, h4):has(a[href*="/logout/"]), body.stand-hub .body-main .en__component--copyblock a[href*="/logout/"] { display: none !important; } /* one Log out, in the bar */
+
+/* ---------- 3. Page frame ---------- */
+/* Top bar: logo | Donor Portal ... Get help | Log out, fixed at the top with a red line */
+.sh-topbar, .sh-topbar-space { display: none; }
+body.stand-hub { color-scheme: light; /* light only, even on a device in dark mode */ background-color: var(--sh-bg) !important; margin: 0 !important; overflow-wrap: break-word; } /* the top bar is pinned at 0; long emails wrap */
+html:has(body.stand-hub) { color-scheme: light; scroll-padding-top: calc(var(--sh-topbar-h, 61px) + 16px); }
+body.stand-hub .sh-topbar { display: block; position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: var(--sh-bg); border-bottom: 4px solid var(--sh-red); font-family: var(--sh-font-body); }
+body.stand-hub .sh-topbar-space { display: block; height: var(--sh-topbar-h); }
+body.stand-hub .sh-topbar__inner { max-width: 1320px; margin: 0 auto; padding: 8px 24px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
+body.stand-hub .sh-topbar__brand { display: flex; align-items: center; gap: 14px; }
+body.stand-hub .sh-topbar__logo { display: inline-flex; min-height: 44px; align-items: center; }
+body.stand-hub .sh-topbar__logo img { height: 30px; width: auto; display: block; }
+body.stand-hub .sh-topbar__title { font-family: var(--sh-font-head); font-weight: 600; font-size: 18px; color: var(--sh-text); padding-left: 14px; border-left: 2px solid var(--sh-border); line-height: 1.2; white-space: nowrap; }
+body.stand-hub .sh-topbar__nav { display: flex; align-items: center; gap: 12px; }
+body.stand-hub .sh-topbar__nav a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 10px; font-size: 16px; font-weight: 400; color: var(--sh-text) !important; text-decoration: underline; text-underline-offset: 3px; }
+body.stand-hub .sh-topbar__nav a[hidden], body.stand-hub .sh-topbar__sep[hidden] { display: none; }
+body.stand-hub .sh-topbar__nav #sh-logout { background: var(--sh-red); color: #FFFFFF !important; text-decoration: none; border: 2px solid transparent; border-radius: 8px; padding: 0 18px; font-family: var(--sh-font-head); font-weight: 600; }
+body.stand-hub .sh-topbar__nav #sh-logout:hover { background: var(--sh-teal); }
+body.stand-hub .sh-topbar__sep { width: 2px; height: 24px; background: var(--sh-border); }
+body.stand-hub .sh-topbar a:focus-visible { outline: 3px solid var(--sh-focus); outline-offset: 2px; }
+@media (max-width: 600px) {
+  body.stand-hub .sh-topbar__inner { padding: 8px 16px; }
+  body.stand-hub .sh-topbar__logo img { height: 24px; }
+  body.stand-hub .sh-topbar__title { font-size: 15px; padding-left: 10px; }
+  body.stand-hub .sh-topbar__nav a { padding: 0 6px; font-size: 15px; }
+}
+@media (max-width: 480px) { /* one row: logo, Get help, Log out (two rows took 120px of a phone screen) */
+  body.stand-hub .sh-topbar__inner { flex-wrap: nowrap; padding: 8px 12px; gap: 8px; }
+  body.stand-hub .sh-topbar__title, body.stand-hub .sh-topbar__sep { display: none !important; }
+  body.stand-hub .sh-topbar__nav { gap: 4px; }
+  body.stand-hub .sh-topbar__nav a { white-space: nowrap; }
+  body.stand-hub .sh-topbar__nav #sh-logout { padding: 0 14px; }
+  body.stand-hub .sh-topbar:has(#sh-logout[hidden]) .sh-topbar__title { display: block !important; } /* no Log out (sign-in, page 3): room for the label */
+}
+/* Centred column with a soft fade */
+body.stand-hub .body-main { display: block; max-width: 1320px; margin-left: auto !important; margin-right: auto !important; padding: 40px 40px 64px !important; box-sizing: border-box; box-shadow: 0 0 56px rgba(16, 16, 18, .18); }
+@media (max-width: 600px) {
+  body.stand-hub .body-main { padding: 24px 16px 40px !important; box-shadow: none; }
+}
+body.stand-hub .body-main .en__component--column { min-width: 0; } /* EN's own columns are at least 300px, wider than a 320px phone's column */
+/* Greeting: EN's welcome text as the prototype's heading and lede */
+body.stand-hub .body-main .sh-hello, body.stand-hub .body-main .sh-hello * { font-family: var(--sh-font-head) !important; font-weight: 600 !important; font-size: clamp(28px, 4vw, 40px) !important; line-height: 1.2 !important; color: var(--sh-text) !important; letter-spacing: normal !important; }
+body.stand-hub .body-main .sh-hello { margin: 0 0 8px !important; }
+body.stand-hub .body-main .sh-lede, body.stand-hub .body-main .sh-lede * { font-family: var(--sh-font-body) !important; font-size: 18px !important; font-weight: var(--sh-body-weight) !important; line-height: 1.55 !important; color: var(--sh-text) !important; }
+body.stand-hub .body-main .sh-lede { max-width: 640px; margin: 0 0 4px !important; }
+
+/* ---------- 4. Buttons and links (one definition, reused by the wrapper and EN) ---------- */
+body.stand-hub .sh-btn,
+body.stand-hub .en__hubOverlay .en__submit button,
+body.stand-hub .en__hubOverlay .en__button--submit,
+body.stand-hub .en__supporterHubLogin .en__submit button,
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"],
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 12px 20px !important; border-radius: 8px !important; box-sizing: border-box; /* links too: one 48px size */
+  border: 2px solid transparent !important; background: var(--sh-red) !important; color: #FFFFFF !important;
+  font-family: var(--sh-font-head); font-weight: 600; font-size: 16px !important; line-height: 1.2;
+  cursor: pointer; text-decoration: none; text-align: center;
+}
+body.stand-hub .sh-btn:hover,
+body.stand-hub .en__hubOverlay .en__submit button:hover,
+body.stand-hub .en__hubOverlay .en__button--submit:hover,
+body.stand-hub .en__supporterHubLogin .en__submit button:hover,
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"]:hover { background: var(--sh-teal) !important; }
+body.stand-hub .sh-btn--secondary,
+body.stand-hub .en__hubOverlay .en__submit .en__button--close, /* must beat ".en__submit button" above */
+body.stand-hub .en__hubPledge__list__actions .en__button,
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] { background: var(--sh-bg) !important; color: var(--sh-text) !important; border-color: var(--sh-control) !important; font-weight: 500; }
+body.stand-hub .sh-btn--secondary:hover, body.stand-hub .en__hubOverlay .en__submit .en__button--close:hover, body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"]:hover { background: var(--sh-hover) !important; }
+body.stand-hub .body-main a.sh-btn, body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"] { color: #FFFFFF !important; text-decoration: none !important; } /* a link styled as a button: not the dark, underlined link style */
+body.stand-hub .sh-btn--light { background: #FFFFFF !important; color: #101012 !important; }
+body.stand-hub .sh-btn--light:hover { outline: 2px solid currentColor; }
+body.stand-hub .sh-link { background: none; border: 0; padding: 8px 4px; min-height: 44px; cursor: pointer; color: var(--sh-text); font: inherit; font-weight: 400; font-size: 16px; text-decoration: underline; text-underline-offset: 3px; }
+body.stand-hub .sh-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* ---------- 5. Dashboard layout and cards ---------- */
+body.stand-hub .sh-dash { width: 100%; display: flex; flex-direction: column; gap: 20px; margin: 8px 0 24px; min-height: 120px; }
+body.stand-hub .sh-dash__body, body.stand-hub .sh-dash__main, body.stand-hub .sh-dash__side, body.stand-hub .sh-stack { display: flex; flex-direction: column; gap: 20px; }
+body.stand-hub .sh-dash__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 960px) { body.stand-hub .sh-dash__grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; } }
+body.stand-hub .sh-dash h2 { font-weight: 600; font-size: 22px; margin: 0 0 8px; }
+body.stand-hub .sh-dash p:not([class]) { margin: 0; }
+body.stand-hub .sh-dash .sh-subhead { font-family: var(--sh-font-head); font-weight: 600; font-size: 18px; margin: 24px 0 6px; color: var(--sh-text) !important; }
+body.stand-hub .sh-card { background: var(--sh-surface); border-radius: 12px; padding: 24px; color: var(--sh-text); }
+body.stand-hub .sh-card--outline { background: var(--sh-bg); border: 2px solid var(--sh-border); }
+body.stand-hub .sh-dash .sh-card h2 { color: var(--sh-text) !important; }
+body.stand-hub .sh-card__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 600px) { body.stand-hub .sh-card { padding: 20px; } }
+body.stand-hub .sh-lines { margin: 0 0 16px; }
+body.stand-hub .sh-lines p { margin: 0 0 4px; }
+/* Gift card */
+body.stand-hub .sh-status { display: inline-flex; align-items: center; gap: 8px; background: var(--sh-bg); border-radius: 999px; padding: 6px 14px; font-size: 15px; font-weight: 500; white-space: nowrap; flex-shrink: 0; } /* one line; drops under a long heading */
+body.stand-hub .sh-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sh-teal); }
+body.stand-hub .sh-dot--paused { background: var(--sh-control); }
+body.stand-hub .sh-dot--bad { background: var(--sh-red); }
+body.stand-hub .sh-amount { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 8px 0 20px; }
+body.stand-hub .sh-amount__value { background: var(--sh-red); color: #FFFFFF; font-family: var(--sh-font-head); font-weight: 600; font-size: 40px; line-height: 1.1; padding: 2px 12px; }
+body.stand-hub .sh-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; margin: 0 0 20px; }
+body.stand-hub .sh-facts dt { font-size: 15px; font-weight: 400; }
+body.stand-hub .sh-facts dd { margin: 2px 0 0; font-weight: 500; }
+@media (max-width: 600px) { body.stand-hub .sh-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Help card (Cary): black */
+body.stand-hub .sh-card--inverse { background: var(--sh-black); color: #FFFFFF; }
+body.stand-hub .sh-dash .sh-card--inverse h2, body.stand-hub .sh-dash .sh-card--inverse a { color: #FFFFFF !important; }
+body.stand-hub .sh-dash .sh-card--inverse p { margin: 0 0 12px !important; }
+body.stand-hub .sh-card--inverse :focus-visible { outline-color: #FFFFFF; }
+body.stand-hub .sh-strong { font-weight: 400; }
+body.stand-hub #sh-help { scroll-margin-top: calc(var(--sh-topbar-h) + 16px); }
+body.stand-hub #sh-signedout { max-width: 640px; margin: 8px auto 24px; text-align: center; }
+body.stand-hub #sh-signedout .sh-row { justify-content: center; }
+body.stand-hub:has(#sh-signedout) .body-main .en__component--hubgadget,
+body.stand-hub:has(#sh-signedout) .body-main .en__component--copyblock { display: none !important; } /* a page rule: EN rewrites the tiles' classes */
+body.stand-hub #sh-signedout h1 { font-family: var(--sh-font-head); font-weight: 600; font-size: 28px; margin: 0 0 8px; }
+/* EN's own tiles: hidden once the dashboard has loaded; plain and keyboard-reachable if it hasn't */
+body.stand-hub .en__component--hubgadget { background: var(--sh-bg) !important; border: 2px solid var(--sh-control) !important; border-radius: 12px !important; box-shadow: none !important; min-height: 64px; }
+body.stand-hub .en__component--hubgadget span { color: var(--sh-text) !important; font-family: var(--sh-font-head); font-weight: 500; }
+body.stand-hub .en__component--hubgadget:hover { background: var(--sh-surface) !important; }
+body.stand-hub .en__component--hubgadget.sh-tile--replaced { display: none !important; }
+
+/* ---------- 6. Banners and notices ---------- */
+body.stand-hub .sh-banner { position: relative; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-radius: 12px; padding: 20px 64px 20px 24px; }
+body.stand-hub .sh-banner__text { flex: 1 1 280px; }
+body.stand-hub .sh-banner__text h2 { font-size: 19px; margin: 0 0 4px !important; color: inherit; }
+body.stand-hub .sh-banner__text p { margin: 0 !important; }
+body.stand-hub .sh-banner .sh-btn { margin: 0 !important; align-self: center; }
+body.stand-hub .sh-banner--warning { background: var(--sh-marigold); color: #101012; }
+body.stand-hub .sh-banner--teal { background: var(--sh-teal); color: #FFFFFF; }
+body.stand-hub .sh-banner--teal .sh-btn:hover { background: var(--sh-light) !important; color: #101012 !important; border-color: var(--sh-light) !important; } /* not teal on teal */
+body.stand-hub .sh-banner__close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 22px; line-height: 1; }
+body.stand-hub .sh-banner__close:hover { background: rgba(127, 127, 127, .25); }
+body.stand-hub .sh-notice { background: var(--sh-success-bg); border: 2px solid var(--sh-teal); border-radius: 12px; padding: 16px 20px; font-weight: 400; }
+body.stand-hub .sh-notice--error { border-color: var(--sh-red); }
+
+/* ---------- 7. Giving summary and history ---------- */
+body.stand-hub .sh-totals { display: flex; gap: 16px 40px; flex-wrap: wrap; }
+body.stand-hub .sh-totals__label { font-size: 15px; font-weight: 400; margin: 0; }
+body.stand-hub .sh-totals__value { font-family: var(--sh-font-head); font-weight: 500; font-size: 28px; line-height: 1.1; margin: 0 0 10px; }
+body.stand-hub .sh-chart { margin: 16px 0 0; }
+body.stand-hub .sh-chart__bars { display: flex; align-items: flex-end; gap: 12px; height: 170px; border-bottom: 2px solid var(--sh-text); }
+body.stand-hub .sh-chart__bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+body.stand-hub .sh-chart__bar span { font-size: 14px; font-weight: 400; }
+body.stand-hub .sh-chart__bar i { display: block; width: 100%; max-width: 72px; border-radius: 4px 4px 0 0; background: var(--sh-wine); }
+body.stand-hub .sh-chart__bar--now i { background: var(--sh-red); }
+body.stand-hub .sh-chart__years { display: flex; gap: 12px; margin-top: 6px; }
+body.stand-hub .sh-chart__years span { flex: 1; text-align: center; font-size: 14px; font-weight: 400; }
+body.stand-hub .sh-chart__bar span, body.stand-hub .sh-chart__years span { white-space: nowrap; }
+@media (max-width: 600px) { /* phones: the 6 most recent years (the screen-reader text keeps them all) */
+  body.stand-hub .sh-chart__bars, body.stand-hub .sh-chart__years { gap: 6px; }
+  body.stand-hub .sh-chart__bar span, body.stand-hub .sh-chart__years span { font-size: 13px; }
+  body.stand-hub .sh-chart__bar:nth-last-child(n+7), body.stand-hub .sh-chart__years span:nth-last-child(n+7) { display: none; }
+}
+/* Year dropdown: compact, on the heading line */
+body.stand-hub .sh-dash .sh-select {
+  min-height: 44px; width: auto !important; min-width: 112px; flex: 0 0 auto; border: 2px solid var(--sh-control); border-radius: 8px; color: var(--sh-text) !important;
+  font: inherit; font-size: 16px; padding: 6px 40px 6px 12px !important; cursor: pointer; -webkit-appearance: none; appearance: none;
+  background: var(--sh-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23101012' stroke-width='2.5'/%3E%3C/svg%3E") no-repeat right 14px center !important;
+}
+body.stand-hub .sh-dash .sh-select:focus-visible { outline-offset: 0; } /* hugs the border: no double ring */
+body.stand-hub .sh-table { overflow-x: auto; margin: 12px 0 8px; }
+body.stand-hub .sh-table table { width: 100%; border-collapse: collapse; font-size: 16px; }
+body.stand-hub .sh-table th, body.stand-hub .sh-table td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--sh-border); color: var(--sh-text); background: transparent; font-weight: 400; }
+body.stand-hub .sh-table th { font-weight: 500; border-bottom: 2px solid var(--sh-text); }
+body.stand-hub .sh-table .sh-num, body.stand-hub .sh-table td:first-child { white-space: nowrap; }
+body.stand-hub .sh-table .sh-num { text-align: right; }
+body.stand-hub .sh-table .sh-sub { display: none; font-size: 14px; color: #4A4A4F; margin-top: 2px; }
+@media (max-width: 600px) { /* phones: how it was paid moves under the gift type */
+  body.stand-hub .sh-table .sh-sub { display: block; }
+  body.stand-hub .sh-table .sh-paid { display: none; }
+}
+@media (max-width: 600px) { body.stand-hub .sh-table th, body.stand-hub .sh-table td { padding: 12px 6px; } }
+
+/* ---------- 8. Wrapper dialog (save flow, pause, combine, upgrade) ---------- */
+body.stand-hub .sh-dialog {
+  border: 0; border-radius: 16px; padding: 0; width: calc(100% - 32px); max-width: 560px; max-height: calc(100% - 32px);
+  background: var(--sh-bg); color: var(--sh-text); font-family: var(--sh-font-body); font-weight: var(--sh-body-weight); box-shadow: 0 10px 40px rgba(0, 0, 0, .35);
+}
+body.stand-hub .sh-dialog::backdrop { background: var(--sh-overlay); }
+body.stand-hub .sh-dialog__body { padding: 24px 24px calc(24px + env(safe-area-inset-bottom, 0px)); }
+body.stand-hub .sh-dialog__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+body.stand-hub .sh-dialog__head h2 { font-family: var(--sh-font-head); font-size: 24px; margin: 6px 0 0; }
+body.stand-hub .sh-dialog__step { font-size: 14px; margin: 0 0 4px; }
+body.stand-hub .sh-dialog__close { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--sh-surface); color: var(--sh-text); cursor: pointer; font-size: 22px; flex-shrink: 0; }
+body.stand-hub .sh-dialog__intro { margin: 0 0 20px; }
+body.stand-hub .sh-options { display: flex; flex-direction: column; gap: 10px; margin: 0 0 20px; padding: 0; border: 0; }
+body.stand-hub .sh-option { display: flex; align-items: center; gap: 12px; border: 2px solid var(--sh-border); border-radius: 8px; padding: 12px 14px; min-height: 56px; cursor: pointer; font-weight: 400; }
+body.stand-hub .sh-option:has(input:checked) { border-color: var(--sh-control); background: var(--sh-surface); }
+body.stand-hub .sh-option input { width: 22px; height: 22px; margin: 0; accent-color: var(--sh-text); flex-shrink: 0; }
+body.stand-hub .sh-offer {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; cursor: pointer;
+  background: var(--sh-surface); color: var(--sh-text); border: 2px solid var(--sh-control); border-radius: 8px;
+  padding: 14px 16px; min-height: 64px; font-family: var(--sh-font-head); font-weight: 600; font-size: 17px;
+}
+body.stand-hub .sh-offer span { font-family: var(--sh-font-body); font-weight: var(--sh-body-weight); font-size: 15px; }
+body.stand-hub .sh-hint { font-size: 15px; font-weight: 400; margin: 0 0 16px; }
+@media (max-width: 600px) { body.stand-hub .sh-dialog { margin: auto 0 0; width: 100%; max-width: 100%; border-radius: 16px 16px 0 0; max-height: 92%; } }
+
+/* ---------- 9. EN popups: shell, fields, headings ---------- */
+/* The script centres a popup that fits on screen and leaves taller ones at the top. */
+body.stand-hub .en__hubOverlay { font-family: var(--sh-font-body); background: var(--sh-overlay) !important; } /* same dim as the portal's own popups */
+body.stand-hub .en__hubOverlay__popup { width: min(760px, calc(100vw - 32px)) !important; max-width: none !important; box-sizing: border-box; margin-left: auto; margin-right: auto; background: var(--sh-bg) !important; color: var(--sh-text) !important; border-radius: 16px; }
+body.stand-hub .en__hubOverlay__header { background: var(--sh-bg) !important; border-bottom: 2px solid var(--sh-wine) !important; }
+body.stand-hub .en__hubOverlay__header h2 { color: var(--sh-text) !important; font-size: 20px; overflow-wrap: anywhere; }
+body.stand-hub .en__hubOverlay__header a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; color: var(--sh-text) !important; }
+body.stand-hub .en__hubOverlay__content h1, body.stand-hub .en__hubOverlay__content h2 { font-family: var(--sh-font-head) !important; font-weight: 600 !important; font-size: 22px !important; line-height: 1.3 !important; margin: 20px 0 8px !important; }
+body.stand-hub .en__hubOverlay__content h3, body.stand-hub .en__hubOverlay__content h4 { font-family: var(--sh-font-head) !important; font-weight: 600 !important; font-size: 18px !important; line-height: 1.3 !important; }
+/* No decorative icons (the prototype has none) */
+body.stand-hub .en__hubOverlay img:not(.en__field img):not(.en__hubUpdateCC img),
+body.stand-hub .en__hubOverlay [class*="__image"]:not(.en__field *),
+body.stand-hub .en__hubOverlay [class*="--image"]:not(.en__field *),
+body.stand-hub .en__hubOverlay [class*="__icon"]:not(.en__field *) { display: none !important; }
+body.stand-hub .en__hubOverlay .en__hubPledge, body.stand-hub .en__hubOverlay .en__hubPledge__state, body.stand-hub .en__hubOverlay__content { background-image: none !important; }
+/* Fields */
+body.stand-hub .en__hubOverlay .en__field__label { font-weight: 500; font-size: 16px; color: var(--sh-text); }
+body.stand-hub .en__hubOverlay .en__field__label:not(.en__field__label--item) { display: block; width: auto; }
+body.stand-hub .en__hubOverlay input[type="checkbox"] { accent-color: var(--sh-teal); }
+body.stand-hub .en__hubOverlay .en__hubgadget__response, body.stand-hub .en__hubOverlay .sh-saved { text-align: center; }
+body.stand-hub .en__hubOverlay .en__field__input--text, body.stand-hub .en__hubOverlay .en__field__input--email, body.stand-hub .en__hubOverlay .en__field__input--telephone,
+body.stand-hub .en__hubOverlay .en__field__input--select, body.stand-hub .en__hubOverlay .en__field__input--splitselect, body.stand-hub .en__hubOverlay .en__field__input--other, body.stand-hub .en__hubOverlay .en__field--vgs .en__field__input {
+  min-height: 48px; border: 2px solid var(--sh-control) !important; border-radius: 8px !important; background: var(--sh-bg) !important; color: var(--sh-text) !important; font-size: 17px !important;
+}
+body.stand-hub .en__hubOverlay [aria-invalid="true"] { border-color: var(--sh-red) !important; }
+body.stand-hub .sh-error { display: block; margin-top: 6px; color: var(--sh-error-text); font-weight: 500; font-size: 15px; }
+body.stand-hub .sh-error::before { content: "⚠ "; color: var(--sh-red); }
+body.stand-hub .en__hubPledge__list__item { border: 2px solid var(--sh-control); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; cursor: pointer; background: var(--sh-bg); }
+body.stand-hub .en__hubPledge__list__item:hover { background: var(--sh-surface); }
+body.stand-hub .en__hubPledge__panel--copy a[data-action="cancel"] { color: var(--sh-text); text-decoration: underline; }
+
+/* ---------- 10. EN popups: amount chips and gift form modes ---------- */
+/* Amounts: an even grid of three per row (selected = black); Other amount box full width */
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__element--radio { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item { position: relative; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item--other { grid-column: 1 / -1; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__input--other { width: 100% !important; min-height: 56px; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item input[type="radio"] + label {
+  display: flex; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; min-height: 56px; margin: 0 !important; padding: 6px 10px; white-space: nowrap;
+  border: 2px solid var(--sh-control) !important; border-radius: 8px !important; background: var(--sh-bg) !important;
+  color: var(--sh-text) !important; font-family: var(--sh-font-head); font-weight: 600; font-size: 19px; cursor: pointer;
+}
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item input[type="radio"]:checked + label { background: var(--sh-chip-bg) !important; color: var(--sh-chip-text) !important; border-color: var(--sh-chip-bg) !important; }
+body.stand-hub .en__hubOverlay .en__field--donationAmt .en__field__item input[type="radio"]:focus-visible + label { outline: 3px solid var(--sh-focus); outline-offset: 3px; }
+body.stand-hub .en__field--uiPaymentstatus { display: none !important; } /* set by the wrapper for pause / re-activate */
+/* Each gift button shows only its part of EN's one form; fields EN marks invalid always show */
+body.stand-hub .sh-mode .sh-mode-hide,
+body.stand-hub .sh-mode--amount .en__field:not(.en__field--donationAmt):not(.en__field--validationFailed),
+body.stand-hub .sh-mode--day .en__field:not(.en__field--recurrday):not(.en__field--validationFailed),
+body.stand-hub .en__hubUpdateCC:not(.en__hubUpdateCC--enabled) .en__hubUpdateCC__additional { display: none !important; } /* EN's closed new-card section: truly hidden, so its empty card fields are never checked or sent */
+body.stand-hub .sh-mode--card .en__hubUpdateCC__additional { max-height: none !important; } /* EN fixes the open height before the secure card frames finish loading */
+body.stand-hub .sh-mode--amount .en__hubUpdateCC,
+body.stand-hub .sh-mode--day .en__hubUpdateCC,
+body.stand-hub .sh-mode--card .en__field--donationAmt:not(.en__field--validationFailed),
+body.stand-hub .sh-mode--card .en__field--recurrday:not(.en__field--validationFailed) { display: none !important; }
+body.stand-hub .sh-mode-intro { margin: 0 0 16px; font-size: 17px; }
+
+/* ---------- 11. EN popups: give-once / start-monthly form ---------- */
+/* One centred column in sections (gift, billing, address, payment); everything the same width */
+body.stand-hub .en__hubOverlay--pledge .en__component--copyblock [style*="font-size"] { font-size: inherit !important; }
+body.stand-hub .en__hubOverlay .en__hubPledge__panel--donate { max-width: 600px; margin: 0 auto; }
+body.stand-hub .en__hubOverlay .en__hubPledge__columns { display: block !important; }
+body.stand-hub .en__hubOverlay .en__hubPledge__column { width: 100% !important; max-width: 100% !important; float: none !important; padding: 0 !important; margin: 0 !important; }
+body.stand-hub .en__hubOverlay .sh-give-sec, body.stand-hub .en__hubOverlay .en__hubPledge__column { border-top: 1px solid var(--sh-border); padding-top: 8px !important; margin-top: 20px !important; }
+body.stand-hub .en__hubOverlay .sh-give-sec { width: 100% !important; flex: 0 0 100%; box-sizing: border-box; }
+body.stand-hub .en__hubOverlay .sh-give-h { display: block !important; width: 100% !important; box-sizing: border-box; border-top: 1px solid var(--sh-border); padding-top: 20px; margin-top: 12px !important; }
+/* Gift and details popups: every field the full width (EN gives fields fixed widths); card expiry month and year side by side */
+body.stand-hub :is(.en__hubOverlay--pledge, .en__hubOverlay--supporterdetails) .en__field { flex-basis: 100% !important; width: 100% !important; max-width: 100% !important; }
+body.stand-hub :is(.en__hubOverlay--pledge, .en__hubOverlay--supporterdetails) :is(.en__field__element, .en__field__item:not(.en__field--donationAmt .en__field__item), .en__field__input--vgs, select, textarea, input:not([type="checkbox"], [type="radio"], [type="hidden"], [name="donationAmt.other"])) { width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box; }
+body.stand-hub .en__hubOverlay .en__field--ccexpire .en__field__element { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
+body.stand-hub .en__hubOverlay .sh-sublabel { display: block; font-size: 15px; margin: 0 0 4px; }
+/* Billing: pairs side by side (first/last name, city/region, postcode/country), one column on phones */
+body.stand-hub .en__hubOverlay .sh-give-billing { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
+body.stand-hub .en__hubOverlay .sh-give-billing > * { grid-column: 1 / -1; }
+body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--firstName, body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--lastName,
+body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--city, body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--region,
+body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--postcode, body.stand-hub .en__hubOverlay .sh-give-billing > .en__field--country { grid-column: auto; }
+@media (max-width: 520px) { body.stand-hub .en__hubOverlay .sh-give-billing > * { grid-column: 1 / -1 !important; } }
+/* Card only: the payment type (PayPal) stays in EN's form but hidden while Credit Card is chosen */
+body.stand-hub .en__hubOverlay .en__field--paymenttype:has(input[value="Credit Card"]:checked) { display: none !important; }
+
+/* ---------- 12. EN popups: communication preferences ---------- */
+/* Sections (All communications, Newsletters, Alerts and updates) with a line between them; EN's own checkbox beside its main line and subtext. */
+body.stand-hub .en__hubOverlay .sh-subs-intro p { font-size: 17px; margin: 0 0 8px; }
+body.stand-hub .en__hubOverlay .sh-subs-h { display: block !important; width: 100% !important; box-sizing: border-box; font-family: var(--sh-font-head); font-weight: 600; font-size: 18px; margin: 20px 0 4px; padding-top: 20px; border-top: 1px solid var(--sh-border); color: var(--sh-text); }
+body.stand-hub .en__hubOverlay #sh-subs-main { border-top: 0; padding-top: 0; margin-top: 8px; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field--checkbox { padding: 8px 0 !important; margin: 0 !important; border: 0; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field__item { display: flex !important; gap: 12px; align-items: flex-start; width: 100%; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field__input--checkbox { flex: 0 0 20px; width: 20px; height: 20px; margin: 2px 0 0 !important; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field__label--item { display: block !important; flex: 1 1 auto; min-width: 0; margin: 0 !important; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field__label--item p { margin: 0 !important; max-width: none !important; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .en__field__label--item a { color: var(--sh-text) !important; text-decoration: underline; }
+body.stand-hub .en__hubOverlay--supportersubscriptions .sh-opt__sub { font-size: 15px !important; font-weight: 300 !important; font-style: italic; line-height: 1.45 !important; margin-top: 4px !important; }
+
+/* ---------- 13. Login and logout pages ---------- */
+/* Page 3 (EN's logout step): "Back to your Donor Portal" (links to hub/1) red, "Visit our action center" (take-action) white with a black border.
+   Matched by link, so the copy can be reworded or reordered in EN admin. Their buttons share section 4's definition. */
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"], body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] { margin: 6px; }
+body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"] *, body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] * { color: inherit !important; font-weight: inherit; font-size: inherit !important; line-height: inherit !important; }
+body.stand-hub form[action*="/logout/"] .en__component--copyblock :is(h1, h2, h3, h4, p):has(> a[href*="/hub/1"], > a[href*="take-action"]) { line-height: 1.2 !important; margin: 16px 0 !important; } /* EN's inline span colour and <strong>; headings around the buttons keep a normal line height */
+/* Login: EN's header (Hub Login admin) as the page heading; the form in a white card; EN's help copy as the black Cary card; one 560px column */
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--hublogin, body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock { max-width: 560px; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
+body.stand-hub .en__supporterHubLogin { border: 0 !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
+body.stand-hub .en__supporterHubLogin, body.stand-hub .en__supporterHubLogin__header, body.stand-hub .en__supporterHubLogin__body { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+body.stand-hub .en__supporterHubLogin__header { display: block !important; font-family: var(--sh-font-head); font-weight: 600; font-size: clamp(24px, 3.5vw, 32px); line-height: 1.2; text-align: center; color: var(--sh-text); margin: 0 0 24px !important; padding: 0 !important; background: none !important; border: 0 !important; } /* EN draws a grey bar with a line under it */
+body.stand-hub .en__supporterHubLogin__body { background: var(--sh-bg); border: 2px solid var(--sh-border); border-radius: 12px; padding: 24px; }
+body.stand-hub .en__supporterHubLogin .en__field__input, body.stand-hub .en__supporterHubLogin .en__submit button { width: 100% !important; box-sizing: border-box; }
+body.stand-hub .en__supporterHubLogin .en__hubgadget__response { margin: 0 0 16px; }
+body.stand-hub .en__supporterHubLogin__emailAddress { display: block; } /* EN sets the label beside the field */
+body.stand-hub .en__supporterHubLogin .en__field__label { display: block; margin: 0 0 6px; }
+body.stand-hub .en__supporterHubLogin .en__submit { margin-top: 80px; } /* room for NeverBounce's message, which floats under the field */
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock { background: var(--sh-black); color: #FFFFFF; border-radius: 12px; padding: 24px; margin-top: 24px !important; text-align: left; }
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock * { color: #FFFFFF !important; text-align: left !important; }
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock :is(h1, h2, h3) { font-family: var(--sh-font-head); font-weight: 600; font-size: 24px !important; line-height: 1.25 !important; margin: 0 0 12px; }
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock [style*="font-size"] { font-size: inherit !important; }
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock p { margin: 0 0 12px; }
+body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock :focus-visible { outline-color: #FFFFFF; }
+@media (max-width: 600px) { body.stand-hub .en__supporterHubLogin__body, body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock { padding: 20px; } }
+/* Page 3 (EN's logout step): EN's copy in one centred cream card, like the session-ended screen */
+body.stand-hub form[action*="/logout/"] .en__component--copyblock { background: var(--sh-surface); border-radius: 12px; padding: 32px 24px; max-width: 640px; margin: 8px auto 24px !important; text-align: center; box-sizing: border-box; }
+body.stand-hub form[action*="/logout/"] .en__component--copyblock h1 { font-size: clamp(26px, 3.5vw, 32px) !important; margin: 0 0 12px; }
+body.stand-hub form[action*="/logout/"] .en__component--copyblock :is(h2, h3) { font-size: 20px !important; }
+body.stand-hub form[action*="/logout/"] .en__component--copyblock p { margin: 0 0 12px; }
+@media (max-width: 600px) { body.stand-hub form[action*="/logout/"] .en__component--copyblock { padding: 24px 20px; } }
+body.stand-hub .en__supporterHubLogin .en__field__input { min-height: 48px; border: 2px solid var(--sh-control) !important; border-radius: 8px !important; font-size: 17px; }
+/* EN's own success / failure messages (login, details, preferences): like the portal's messages, not the old red dashed box */
+body.stand-hub .en__hubgadget__response--success, body.stand-hub .sh-saved { border: 2px solid var(--sh-teal) !important; border-radius: 12px; background: var(--sh-success-bg); padding: 12px 16px; }
+body.stand-hub .nb-result { color: var(--sh-error-text) !important; } body.stand-hub .nb-result:has(.nb-icon-ok) { color: var(--sh-teal) !important; } /* NeverBounce's message, in portal colours */
+body.stand-hub .en__hubgadget__response--failure { border: 2px solid var(--sh-red) !important; border-radius: 12px; padding: 12px 16px; }
+
+/* ---------- 14. Stand footer fixes ---------- */
+body.stand-hub #footer { font-family: var(--sh-font-body); }
+body.stand-hub #footer :focus-visible { outline-color: #FFFFFF; }
+body.stand-hub #footer .finance-copy h3 { font-size: 24px; } /* red on black passes contrast only as large text */
+body.stand-hub #footer a.footer-nav { color: #FFFFFF; } /* the template's red link is too low-contrast on black at body size */
+body.stand-hub #footer .footer-social a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+
+/* ---------- 15. Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  body.stand-hub .sh-btn, body.stand-hub .sh-offer, body.stand-hub .sh-option { transition: background-color .15s ease, border-color .15s ease; }
+}
