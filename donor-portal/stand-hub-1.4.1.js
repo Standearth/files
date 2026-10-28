@@ -18,7 +18,7 @@
    Troubleshooting: add ?standhub=debug to the Hub URL and open the console;
    each step logs a "[StandHub] ..." line (names and counts only, never values).
    Add ?standhub=off to see EN's original Hub without the wrapper.
-   This readable file is the source: edit it, then rebuild the minified paste-in blocks.
+   This readable file is the source: edit it in the dev kit, run build.py and the checks, then publish it under a new version number.
    ===================================================================== */
 (function () {
   'use strict';
