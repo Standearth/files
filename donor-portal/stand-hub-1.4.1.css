@@ -407,4 +407,9 @@ body.stand-hub #sh-print { display: none; }
   body.stand-hub .sh-st-table tr { break-inside: avoid; }
   body.stand-hub .sh-st-total :is(th, td) { font-weight: 600 !important; border-bottom: 0; border-top: 1pt solid #101012; }
   body.stand-hub .sh-st-foot { font-size: 9pt; }
+  body.stand-hub .sh-st-page { width: 100%; border-collapse: collapse; }
+  body.stand-hub .sh-st-page > * > tr > td { padding: 0; }
+  body.stand-hub #sh-print > .sh-st-foot { position: fixed; left: 0; right: 0; bottom: 0; background: #FFFFFF; } /* repeated on every printed page */
+  body.stand-hub .sh-st-foot { display: flow-root; } /* margins stay inside, so the copy below measures the same as the footer */
+  body.stand-hub .sh-st-room { visibility: hidden; } /* keeps the footer's height free on each page */
 }

@@ -31,6 +31,7 @@
     newGiftUrl: 'https://act.stand.earth/page/77077/donate/1', // "Start a new monthly gift" when a past gift's card has expired
     signInPath: 'hub/1', // the Hub's sign-in step: the session screen's fallback when the page has no EN Logout link
     expiryWarnDays: 45,
+    timeZone: 'America/New_York', // EN's account time zone: gift and payment dates follow EN's records and receipts, not the donor's clock
     // Giving History: exactly the request EN's own gadget makes (Network tab, 20 Oct 2026), same page size.
     historyPath: 'txngiving/transaction?rows={rows}&start={start}&inmem=true&nd=true&ev=true&p2p=true', // receipts left out: not used, and they add work for EN
     historyRows: 10, // EN's own page size; EN refused 200 (HTTP 400). Pages after the first load in parallel.
@@ -79,7 +80,7 @@
   function usd(a) { return 'US$' + cents(a).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function longDate(y, m, d) { return MONTHS_LONG[m - 1] + ' ' + d + ', ' + y; }
   function placeLine(me) { return [me.city, [me.region, me.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '); }
-  function fmtDate(ms) { var d = new Date(ms); return isNaN(d) ? '' : MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+  function fmtDate(ms) { var p = dateOf(ms); return p ? MONTHS[p.m - 1] + ' ' + p.d + ', ' + p.y : ''; }
   function ordinal(n) { var s = n % 100 > 10 && n % 100 < 14 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' })[n % 10] || 'th'; return n + s; }
   // EN sends expiry as 08/2027, 082027 or 0827.
   function parseExpiry(v) {
@@ -172,9 +173,13 @@
   /* Giving History. EN's field formats aren't documented, so every value is parsed defensively
      and debug mode logs the shape of the reply (field names, value patterns, never values). */
   function num(v) { if (typeof v === 'number') return v; var n = parseFloat(String(v === null || v === undefined ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; }
-  function dateOf(v) { // EN sends epoch milliseconds
-    var d = new Date(typeof v === 'number' || /^\d+$/.test(String(v)) ? Number(v) : v);
-    return v === null || v === undefined || v === '' || isNaN(d) ? null : { y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() };
+  var EN_DAY = new Intl.DateTimeFormat('en-US', { timeZone: CFG.timeZone, year: 'numeric', month: 'numeric', day: 'numeric' });
+  function dateOf(v) { // EN sends epoch milliseconds: dated in EN's time zone, so a gift at 10:30 PM Eastern on Dec 31 stays in that year everywhere
+    if (v === null || v === undefined || v === '') return null;
+    var plain = String(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/); if (plain) return { y: +plain[1], m: +plain[2], d: +plain[3] }; // a plain date: as given
+    var d = new Date(typeof v === 'number' || /^\d+$/.test(String(v)) ? Number(v) : v), p = {}; if (isNaN(d)) return null;
+    EN_DAY.formatToParts(d).forEach(function (x) { p[x.type] = +x.value; });
+    return { y: p.year, m: p.month, d: p.day };
   }
   function rowPaid(t) { // "Card ending 4242", "Apple Pay (Card ending 4242)", "PayPal", "Bank payment": the gift card's wording; no expiry in history
     var pt = String(t.paymentType || '').toLowerCase(), last = String(t.ccLastFour || t.lastFourDigits || '').replace(/\D/g, '').slice(-4);
@@ -696,13 +701,22 @@
       while (box.firstChild !== hrs[0]) { var n = box.firstChild; (n.nodeType === 1 && (n.tagName === 'IMG' || qs('img', n)) ? head : title).appendChild(n); }
       head.appendChild(title); box.insertBefore(head, hrs[0]);
     }
-    if (hrs.length > 1) { var foot = el('div', { class: 'sh-st-foot' }), last = hrs[hrs.length - 1]; while (last.nextSibling) foot.appendChild(last.nextSibling); box.appendChild(foot); } // below the last line: the footer
+    if (hrs.length > 1) { // the last line and what follows: a footer at the bottom of every printed page (fixed), with an invisible copy in the
+      // table's repeating footer row keeping exactly its height free on each page, so the gift list never runs under it
+      var foot = el('div', { class: 'sh-st-foot' }), last = hrs[hrs.length - 1], cell = el('td');
+      while (last.nextSibling) foot.appendChild(last.nextSibling); foot.insertBefore(last, foot.firstChild);
+      var room = foot.cloneNode(true); room.className = 'sh-st-foot sh-st-room'; room.setAttribute('aria-hidden', 'true');
+      while (box.firstChild) cell.appendChild(box.firstChild);
+      box.appendChild(el('table', { class: 'sh-st-page', role: 'presentation' }, [el('tbody', {}, [el('tr', {}, [cell])]), el('tfoot', {}, [el('tr', {}, [el('td', {}, [room])])])]));
+      box.appendChild(foot);
+    }
     var old = qs('#sh-print'); if (old) old.remove(); document.body.appendChild(box);
     log('statement: ' + rows.length + ' gift(s) for ' + y);
     var img = qs('img', box), name = document.title, h = qs('h1, h2', box);
     (img && !img.complete ? new Promise(function (r) { img.onload = img.onerror = r; setTimeout(r, 3000); }) : Promise.resolve()).then(function () {
       document.title = (h && h.textContent.trim()) || 'Giving statement ' + y; // the browser's suggested PDF file name
-      window.addEventListener('afterprint', function () { document.title = name; box.remove(); }, { once: true }); // a later Ctrl+P prints the page as usual
+      var top = window.scrollY; window.scrollTo(0, 0); // Chrome shifts a fixed footer by the scroll position when printing, pushing it off the page
+      window.addEventListener('afterprint', function () { document.title = name; box.remove(); window.scrollTo(0, top); }, { once: true }); // a later Ctrl+P prints the page as usual
       window.print();
     });
   }
