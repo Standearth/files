@@ -62,6 +62,7 @@ A misspelt placeholder stays visible as typed, so it shows up in the print previ
 
 | Version | Date | Main changes |
 |---|---|---|
+| 1.4.2 | Oct 2026 | Help card text from EN's help copy block (edited in EN); "Donor Services" instead of a staff name; new hours |
 | 1.4.1 | Oct 2026 | Upgrade offer by gift size (20% up to $25, 15% under $40, 10% from $40, rounded up); "Give a little more" link on gift cards; "Print or save as PDF" yearly statement for US donors |
 | 1.4.0 | Oct 2026 | First hosted release: wrapper files moved from inline template blocks to this folder |
 

@@ -1,5 +1,5 @@
 /* =====================================================================
-   STAND HUB WRAPPER: STYLES (v1.4.0)
+   STAND HUB WRAPPER: STYLES (v1.4.2)
    Every rule is scoped to body.stand-hub, which the header adds unless the
    kill switch is on (?standhub=off), so turning the wrapper off returns the
    Hub to EN's own look.
@@ -12,7 +12,7 @@
      5. Dashboard layout and cards             13. Login and logout pages
      6. Banners and notices                    14. Stand footer fixes
      7. Giving summary and history             15. Motion
-     8. Wrapper dialog
+     8. Wrapper dialog                         16. Yearly statement (print only)
    Rules: banners red, marigold, black or teal only (never cream); buttons red, teal on
    hover; Readex Pro headings, Roboto body; WCAG 2.2 AA. Light mode only (dark mode removed in v1.2.16).
    ===================================================================== */
@@ -143,12 +143,11 @@ body.stand-hub .sh-facts { display: grid; grid-template-columns: repeat(3, minma
 body.stand-hub .sh-facts dt { font-size: 15px; font-weight: 400; }
 body.stand-hub .sh-facts dd { margin: 2px 0 0; font-weight: 500; }
 @media (max-width: 600px) { body.stand-hub .sh-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* Help card (Cary): black */
+/* Help card: black, its text from EN's help block */
 body.stand-hub .sh-card--inverse { background: var(--sh-black); color: #FFFFFF; }
 body.stand-hub .sh-dash .sh-card--inverse h2, body.stand-hub .sh-dash .sh-card--inverse a { color: #FFFFFF !important; }
 body.stand-hub .sh-dash .sh-card--inverse p { margin: 0 0 12px !important; }
 body.stand-hub .sh-card--inverse :focus-visible { outline-color: #FFFFFF; }
-body.stand-hub .sh-strong { font-weight: 400; }
 body.stand-hub #sh-help { scroll-margin-top: calc(var(--sh-topbar-h) + 16px); }
 body.stand-hub #sh-signedout { max-width: 640px; margin: 8px auto 24px; text-align: center; }
 body.stand-hub #sh-signedout .sh-row { justify-content: center; }
@@ -212,6 +211,8 @@ body.stand-hub .sh-table .sh-sub { display: none; font-size: 14px; color: #4A4A4
   body.stand-hub .sh-table .sh-paid { display: none; }
 }
 @media (max-width: 600px) { body.stand-hub .sh-table th, body.stand-hub .sh-table td { padding: 12px 6px; } }
+
+body.stand-hub .en__component--codeblock:has(> #sh-statement) { display: none !important; } /* the team's statement text (page 2): read by the wrapper, never shown on screen */
 
 /* ---------- 8. Wrapper dialog (save flow, pause, combine, upgrade) ---------- */
 body.stand-hub .sh-dialog {
@@ -339,7 +340,7 @@ body.stand-hub .en__hubOverlay--supportersubscriptions .sh-opt__sub { font-size:
 body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"], body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] { margin: 6px; }
 body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="/hub/1"] *, body.stand-hub form[action*="/logout/"] .en__component--copyblock a[href*="take-action"] * { color: inherit !important; font-weight: inherit; font-size: inherit !important; line-height: inherit !important; }
 body.stand-hub form[action*="/logout/"] .en__component--copyblock :is(h1, h2, h3, h4, p):has(> a[href*="/hub/1"], > a[href*="take-action"]) { line-height: 1.2 !important; margin: 16px 0 !important; } /* EN's inline span colour and <strong>; headings around the buttons keep a normal line height */
-/* Login: EN's header (Hub Login admin) as the page heading; the form in a white card; EN's help copy as the black Cary card; one 560px column */
+/* Login: EN's header (Hub Login admin) as the page heading; the form in a white card; EN's help copy as the black help card; one 560px column */
 body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--hublogin, body.stand-hub .body-main:has(.en__supporterHubLogin) .en__component--copyblock { max-width: 560px; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
 body.stand-hub .en__supporterHubLogin { border: 0 !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
 body.stand-hub .en__supporterHubLogin, body.stand-hub .en__supporterHubLogin__header, body.stand-hub .en__supporterHubLogin__body { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
@@ -379,4 +380,35 @@ body.stand-hub #footer .footer-social a { display: inline-flex; min-width: 44px;
 /* ---------- 15. Motion ---------- */
 @media (prefers-reduced-motion: no-preference) {
   body.stand-hub .sh-btn, body.stand-hub .sh-offer, body.stand-hub .sh-option { transition: background-color .15s ease, border-color .15s ease; }
+}
+
+/* ---------- 16. Yearly statement (print only) ---------- */
+/* Built from EN's #sh-statement code block when the donor presses "Print or save as PDF"; removed after printing, so Ctrl+P on its own prints the page as usual. */
+body.stand-hub #sh-print { display: none; }
+@media print {
+  @page { margin: 16mm 18mm; }
+  body.stand-hub:has(> #sh-print) { padding: 0 !important; background: #FFFFFF !important; }
+  body.stand-hub:has(> #sh-print) > :not(#sh-print) { display: none !important; }
+  body.stand-hub #sh-print { display: block; color: #101012; font: 10.5pt/1.45 Roboto, Arial, sans-serif; }
+  body.stand-hub #sh-print p { margin: 0 0 8pt; }
+  body.stand-hub #sh-print :is(h1, h2) { font: 600 16pt/1.2 'Readex Pro', Arial, sans-serif; margin: 0 0 4pt; }
+  body.stand-hub #sh-print hr { border: 0; border-top: 1pt solid #101012; margin: 12pt 0 14pt; }
+  body.stand-hub #sh-print a { color: inherit; text-decoration: none; }
+  body.stand-hub .sh-st-head { display: flex; justify-content: space-between; align-items: center; gap: 24pt; }
+  body.stand-hub .sh-st-head p { margin: 0; }
+  body.stand-hub .sh-st-head img { display: block; max-width: 200pt; height: auto; }
+  body.stand-hub .sh-st-title { text-align: right; }
+  body.stand-hub .sh-st-address { margin-bottom: 14pt !important; }
+  body.stand-hub .sh-st-table { width: 100%; border-collapse: collapse; margin: 4pt 0 14pt; }
+  body.stand-hub .sh-st-table :is(th, td) { text-align: left; padding: 4pt 8pt 4pt 0; border-bottom: .5pt solid #DDDBD0; font-weight: 400; }
+  body.stand-hub .sh-st-table thead th { font-weight: 600; border-bottom: 1pt solid #101012; }
+  body.stand-hub .sh-st-table .sh-num { text-align: right; padding-right: 0; }
+  body.stand-hub .sh-st-table tr { break-inside: avoid; }
+  body.stand-hub .sh-st-total :is(th, td) { font-weight: 600 !important; border-bottom: 0; border-top: 1pt solid #101012; }
+  body.stand-hub .sh-st-foot { font-size: 9pt; }
+  body.stand-hub .sh-st-page { width: 100%; border-collapse: collapse; }
+  body.stand-hub .sh-st-page > * > tr > td { padding: 0; }
+  body.stand-hub #sh-print > .sh-st-foot { position: fixed; left: 0; right: 0; bottom: 0; background: #FFFFFF; } /* repeated on every printed page */
+  body.stand-hub .sh-st-foot { display: flow-root; } /* margins stay inside, so the copy below measures the same as the footer */
+  body.stand-hub .sh-st-room { visibility: hidden; } /* keeps the footer's height free on each page */
 }

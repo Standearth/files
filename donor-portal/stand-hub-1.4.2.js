@@ -1,5 +1,5 @@
 /* =====================================================================
-   STAND HUB WRAPPER: SCRIPT (v1.4.0)
+   STAND HUB WRAPPER: SCRIPT (v1.4.2)
 
    What it does: reads EN's own Hub data (same-origin JSON), draws the dashboard,
    and drives EN's own gadget controls. Every change is still made by EN.
@@ -8,7 +8,7 @@
    every gift change is confirmed by the donor first.
 
    Contents
-     1. Config (contact, amounts, history request)    7. Dashboard (banners, cards, giving, history)
+     1. Config (contact, amounts, history request)    7. Dashboard (banners, cards, history, statement)
      2. Utilities (DOM, money, dates, storage)        8. EN popups (accessibility, titles, layouts, forms)
      3. Data (gift and giving-history JSON)           9. Global listeners (clicks, keys, outside click)
      4. EN driver and gift form modes                10. Page frame (top bar, greeting)
@@ -18,7 +18,7 @@
    Troubleshooting: add ?standhub=debug to the Hub URL and open the console;
    each step logs a "[StandHub] ..." line (names and counts only, never values).
    Add ?standhub=off to see EN's original Hub without the wrapper.
-   This readable file is the source: edit it, then rebuild the minified paste-in blocks.
+   This readable file is the source: edit it in the dev kit, run build.py and the checks, then publish it under a new version number.
    ===================================================================== */
 (function () {
   'use strict';
@@ -26,11 +26,12 @@
 
   /* ---------- 1. Config ---------- */
   var CFG = {
-    contact: { name: 'Cary', email: 'gifts@stand.earth', phone: '1-833-STAND-33', phoneDigits: '1-833-782-6333', hours: 'Monday to Friday, 9:00 AM to 5:00 PM PT' },
-    upgradeRate: 0.10, // upgrade banner: suggest this much more (10%), one active monthly gift only
+    contact: { email: 'gifts@stand.earth', phone: '1-833-STAND-33', phoneDigits: '1-833-782-6333', hours: 'Monday to Thursday, 9 AM to 5 PM Pacific time (Vancouver)' }, // short messages only; the help card's text is EN's own copy block (helpBlock)
+    upgradePct: function (c) { return c <= 2500 ? 20 : c < 4000 ? 15 : 10; }, // % more to offer, by the gift in cents (team, 27 Oct): up to $25 +20%, under $40 +15%, from $40 +10%; banner and subtle ask
     newGiftUrl: 'https://act.stand.earth/page/77077/donate/1', // "Start a new monthly gift" when a past gift's card has expired
     signInPath: 'hub/1', // the Hub's sign-in step: the session screen's fallback when the page has no EN Logout link
     expiryWarnDays: 45,
+    timeZone: 'America/New_York', // EN's account time zone: gift and payment dates follow EN's records and receipts, not the donor's clock
     // Giving History: exactly the request EN's own gadget makes (Network tab, 20 Oct 2026), same page size.
     historyPath: 'txngiving/transaction?rows={rows}&start={start}&inmem=true&nd=true&ev=true&p2p=true', // receipts left out: not used, and they add work for EN
     historyRows: 10, // EN's own page size; EN refused 200 (HTTP 400). Pages after the first load in parallel.
@@ -75,7 +76,11 @@
     return '$' + s + (cur ? ' ' + cur : '');
   }
   function charge(a, cur, monthly) { return money(a, cur || 'CAD') + (monthly ? ' Monthly' : ''); }
-  function fmtDate(ms) { var d = new Date(ms); return isNaN(d) ? '' : MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+  function upgradeTo(a) { var c = Math.round(a * 100); return Math.ceil(c * (100 + CFG.upgradePct(c)) / 10000); } // rounded up to a whole amount; in whole cents, so 25 x 1.2 can't come out as 31
+  function usd(a) { return 'US$' + cents(a).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function longDate(y, m, d) { return MONTHS_LONG[m - 1] + ' ' + d + ', ' + y; }
+  function placeLine(me) { return [me.city, [me.region, me.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '); }
+  function fmtDate(ms) { var p = dateOf(ms); return p ? MONTHS[p.m - 1] + ' ' + p.d + ', ' + p.y : ''; }
   function ordinal(n) { var s = n % 100 > 10 && n % 100 < 14 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' })[n % 10] || 'th'; return n + s; }
   // EN sends expiry as 08/2027, 082027 or 0827.
   function parseExpiry(v) {
@@ -100,7 +105,7 @@
     set: function (k, v) { try { sessionStorage.setItem('standhub:' + k, v); } catch (e) { /* storage blocked */ } }
   };
   function contactLine() {
-    return el('p', { class: 'sh-hint' }, ['Prefer help? ' + CFG.contact.name + ' can do this for you: ',
+    return el('p', { class: 'sh-hint' }, ['Need assistance? Contact Donor Services at ',
       mailLink(), ' or ' + CFG.contact.phone + '.']);
   }
 
@@ -142,7 +147,7 @@
       var keys = Object.keys(f); log('details: EN details gadget ' + (keys.length ? 'gave ' + keys.join(', ') : 'gave no details (labels: ' + Object.keys(d).filter(function (k) { return !/id$/i.test(k); }) + ')'));
       if (!keys.length) return null;
       var me = {}; Object.keys(ME_KEYS).forEach(function (k) { if (ME_KEYS[k] && k in f) me[ME_KEYS[k]] = f[k].trim(); });
-      if ('firstName' in f || 'lastName' in f) me.name = [f.firstName, f.lastName].filter(Boolean).join(' ').trim();
+      if ('firstName' in f || 'lastName' in f) { me.name = [f.firstName, f.lastName].filter(Boolean).join(' ').trim(); me.first = (f.firstName || '').trim(); }
       return me;
     }).catch(function (e) { log('details: EN details gadget request failed (' + e.message + '), showing details from login'); return null; });
   }
@@ -161,16 +166,20 @@
     return {
       state: String(d.state || ''), gifts: gifts, fields: Object.keys(d).join(', '), target: d.recurring && d.recurring.id ? String(d.recurring.id) : null, // the past gift EN re-activates, if EN says
       region: String(sup.region || ''), country: String(sup.country || ''),
-      me: { name: [sup.firstName, sup.lastName].filter(Boolean).join(' '), email: sup.emailAddress || '', phone: sup.phoneNumber || '', line1: sup.address1 || '', city: sup.city || '', region: sup.region || '', postcode: sup.postcode || '', country: sup.country || '' }
+      me: { name: [sup.firstName, sup.lastName].filter(Boolean).join(' '), first: sup.firstName || '', email: sup.emailAddress || '', phone: sup.phoneNumber || '', line1: sup.address1 || '', city: sup.city || '', region: sup.region || '', postcode: sup.postcode || '', country: sup.country || '' }
     };
   }
   function loadPledge() { var u = gadgetUrl('PLEDGE', 'pledge'); return u ? getJSON(u).then(normalizePledge) : Promise.reject(new Error('ids')); }
   /* Giving History. EN's field formats aren't documented, so every value is parsed defensively
      and debug mode logs the shape of the reply (field names, value patterns, never values). */
   function num(v) { if (typeof v === 'number') return v; var n = parseFloat(String(v === null || v === undefined ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; }
-  function dateOf(v) { // EN sends epoch milliseconds
-    var d = new Date(typeof v === 'number' || /^\d+$/.test(String(v)) ? Number(v) : v);
-    return v === null || v === undefined || v === '' || isNaN(d) ? null : { y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() };
+  var EN_DAY = new Intl.DateTimeFormat('en-US', { timeZone: CFG.timeZone, year: 'numeric', month: 'numeric', day: 'numeric' });
+  function dateOf(v) { // EN sends epoch milliseconds: dated in EN's time zone, so a gift at 10:30 PM Eastern on Dec 31 stays in that year everywhere
+    if (v === null || v === undefined || v === '') return null;
+    var plain = String(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/); if (plain) return { y: +plain[1], m: +plain[2], d: +plain[3] }; // a plain date: as given
+    var d = new Date(typeof v === 'number' || /^\d+$/.test(String(v)) ? Number(v) : v), p = {}; if (isNaN(d)) return null;
+    EN_DAY.formatToParts(d).forEach(function (x) { p[x.type] = +x.value; });
+    return { y: p.year, m: p.month, d: p.day };
   }
   function rowPaid(t) { // "Card ending 4242", "Apple Pay (Card ending 4242)", "PayPal", "Bank payment": the gift card's wording; no expiry in history
     var pt = String(t.paymentType || '').toLowerCase(), last = String(t.ccLastFour || t.lastFourDigits || '').replace(/\D/g, '').slice(-4);
@@ -416,7 +425,7 @@
     box.replaceChildren(el('div', { class: 'sh-notice' + (isError ? ' sh-notice--error' : ''), tabindex: '-1' }, [msg]));
     box.firstChild.focus();
   }
-  function failMsg() { return 'That change didn’t go through. Please try again, or contact ' + CFG.contact.name + ' at ' + CFG.contact.email + ' or ' + CFG.contact.phone + '.'; }
+  function failMsg() { return 'That change didn’t go through. Please try again, or contact Donor Services at ' + CFG.contact.email + ' or ' + CFG.contact.phone + '.'; }
   function acted() { store.set('acted', '1'); }
   function runEN(giftId, action, successMsg) {
     dlg.busy = true;
@@ -495,7 +504,7 @@
       dlg.show({
         title: 'Change how you pay',
         body: [intro('Your ' + charge(g.amount, g.currency, true) + ' gift is paid with ' + paidWith(g) + '. To use a different PayPal account, sign in to PayPal.'),
-          el('p', { class: 'sh-hint' }, ['Want to switch this gift to a card? ' + CFG.contact.name + ' can set that up for you, keeping the same amount and payment day: ',
+          el('p', { class: 'sh-hint' }, ['Want to switch this gift to a card? Donor Services can set that up for you, keeping the same amount and payment day: ',
             mailLink(), ' or ' + CFG.contact.phone + ' (' + CFG.contact.phoneDigits + '), ' + CFG.contact.hours + '.']),
           btn('Close', dlg.close, 'secondary')]
       });
@@ -548,7 +557,7 @@
       el('div', { class: 'sh-banner__text' }, [el('h2', { text: title }), text ? el('p', { text: text }) : null]),
       action,
       el('button', { class: 'sh-banner__close', type: 'button', 'aria-label': 'Hide this message', text: '×', onclick: function () {
-        store.set('hide:' + key, '1'); node.remove(); var h = qs('#sh-dash'); if (h) h.focus();
+        store.set('hide:' + key, '1'); node.remove(); if (key === 'upgrade') qsa('.sh-ask').forEach(function (n) { n.hidden = false; }); var h = qs('#sh-dash'); if (h) h.focus();
       } })
     ]);
     return node;
@@ -567,11 +576,13 @@
       var sum = gifts.reduce(function (s, g) { return s + g.amount; }, 0);
       out.push(banner('teal', 'multi', 'You have ' + gifts.length + ' monthly gifts', 'Together you give ' + money(sum, gifts[0].currency) + ' a month. Prefer one payment? You can combine them.', btn('Combine into one gift', flows.combine, 'light')));
     }
-    var one = gifts.length === 1 && gifts[0], up = one && cents(one.amount * (1 + CFG.upgradeRate));
+    var one = gifts.length === 1 && gifts[0], up = one && upgradeTo(one.amount);
     if (one) log('upgrade banner: ' + (expiring ? 'not shown (card-expiry banner shows instead)' : store.get('hide:upgrade') ? 'not shown (closed this visit)' : store.get('acted') ? 'not shown (a change was made this visit)' : 'shown'));
+    S.upBanner = false; // read by the gift cards: the subtle ask waits while this banner is on screen
     if (one && !expiring && up > one.amount && !store.get('acted')) {
-      out.push(banner('teal', 'upgrade', 'Thank you for your monthly gift of ' + money(one.amount) + '.', 'Would you consider increasing it to ' + money(up) + ' a month?',
+      out.push(S.upBanner = banner('teal', 'upgrade', 'Thank you for your monthly gift of ' + money(one.amount) + '.', 'Would you consider increasing it to ' + money(up) + ' a month?',
         btn('Yes, give ' + charge(up, one.currency, true), function () { flows.upgrade(one, up); }, 'light')));
+      S.upBanner = !!S.upBanner;
     }
     return out.filter(Boolean);
   }
@@ -581,8 +592,13 @@
       g.day ? fact('Payment day', ordinal(g.day) + ' of the month') : null]);
   }
   function fact(label, value) { return el('div', {}, [el('dt', { text: label }), el('dd', {}, [].concat(value))]); }
+  function askReason(g) { // the subtle ask: never after a change this visit, never on a card that has expired or expires soon
+    var d = daysToExpiry(g.exp);
+    return store.get('acted') ? 'a change was made this visit' : d !== null && d <= CFG.expiryWarnDays ? 'card expired or expires soon' : '';
+  }
   function giftCard(g, i, n) {
-    var id = uid('gift');
+    var id = uid('gift'), no = askReason(g);
+    log('subtle ask: gift ' + (i + 1) + ' of ' + n + ' ' + (no ? 'not shown (' + no + ')' : S.upBanner ? 'waits (upgrade banner on screen)' : 'shown'));
     var payBtn = g.canUpdateCard ? btn('Update card', function () { openFor(g, 'card'); }, 'secondary')
       : btn('Change payment method', function () { flows.contact(g); }, 'secondary');
     return el('section', { class: 'sh-card', 'aria-labelledby': id }, [
@@ -595,6 +611,7 @@
         payBtn,
         btn('Change payment day', function () { openFor(g, 'day'); }, 'secondary')]),
       el('div', { class: 'sh-row' }, [
+        no ? null : el('button', { class: 'sh-link sh-ask', type: 'button', hidden: S.upBanner, text: 'Give a little more', onclick: function () { flows.upgrade(g, upgradeTo(g.amount)); } }),
         el('button', { class: 'sh-link', type: 'button', text: 'Cancel this gift', onclick: function () { flows.cancel(g); } })])
     ]);
   }
@@ -613,7 +630,7 @@
       old ? el('p', { class: 'sh-hint', text: 'The card ending ' + g.last4 + ' expired ' + fmtExp(g.exp) + ', so this gift can’t be restarted here. You can start a new monthly gift instead.' }) : null,
       el('div', { class: 'sh-row' }, actions),
       old ? el('p', { class: 'sh-hint', style: 'margin-top:12px', text: 'This opens our donation page in a new tab. To come back to the portal afterwards, you’ll need a new sign-in link.' }) : null,
-      old || st === 'SUSPENDED' ? el('p', { class: 'sh-hint', style: 'margin-top:12px' }, [(old ? 'Or contact ' : 'Need help? Contact ') + c.name + ' at ', mailLink(), ' or ' + c.phone + '.']) : null
+      old || st === 'SUSPENDED' ? el('p', { class: 'sh-hint', style: 'margin-top:12px' }, [(old ? 'Or contact Donor Services at ' : 'Need help? Contact Donor Services at '), mailLink(), ' or ' + c.phone + '.']) : null
     ]);
   }
   function startCard(title, text, label, go) {
@@ -647,7 +664,7 @@
       years.map(function (y) { return el('option', { value: y, text: y, selected: String(y) === yr }); }));
     var head = el('tr', {}, ['Date', 'Gift', 'Paid with', 'Amount'].map(function (t, i) { return el('th', { scope: 'col', class: ['', '', 'sh-paid', 'sh-num'][i] || null, text: t }); })); // Paid with: its own column on wider screens, under the gift type on phones
     return el('section', { class: 'sh-card sh-card--outline', 'aria-labelledby': 'sh-hist-h' }, [
-      el('div', { class: 'sh-card__head' }, [el('h2', { id: 'sh-hist-h', text: 'Giving history' }), pick]),
+      el('div', { class: 'sh-card__head' }, [el('h2', { id: 'sh-hist-h', text: 'Giving history' }), el('div', { class: 'sh-row' }, [pick, statementBtn(h, +yr)])]),
       el('div', { class: 'sh-table', tabindex: '0', role: 'region', 'aria-labelledby': 'sh-hist-h' }, [el('table', {}, [srOnly('caption', 'Gifts, newest first'), el('thead', {}, [head]),
         el('tbody', {}, list.map(function (r) {
           return el('tr', {}, [el('td', {}, [el('time', { datetime: r.dt.y + '-' + pad2(r.dt.m) + '-' + pad2(r.dt.d), text: MONTHS[r.dt.m - 1] + ' ' + r.dt.d })]), el('td', {}, [r.type, r.paid ? el('span', { class: 'sh-sub', text: r.paid }) : null]), el('td', { class: 'sh-paid', text: r.paid }), el('td', { class: 'sh-num', text: r.c + ' ' + money(r.a).replace(/^\$(\d[\d,]*)$/, '$$$1.00') })]);
@@ -655,22 +672,78 @@
       shown.length > 3 ? el('button', { id: 'sh-hist-toggle', class: 'sh-link', type: 'button', 'aria-expanded': String(!!S.histAll), text: S.histAll ? 'Show fewer gifts' : 'Show all ' + shown.length + ' gifts',
         onclick: function () { S.histAll = !S.histAll; updateHistory(S.history); } }) : null]);
   }
+  function statementBtn(h, y) { // yearly statement for US donors: needs the team's text on the page (EN code block #sh-statement), USD as the main currency, and USD gifts that year
+    var why = !qs('#sh-statement') ? 'no #sh-statement block on the page' : mainCurrency(h) !== 'USD' ? 'main currency is not USD' : !h.list.some(function (r) { return r.c === 'USD' && r.dt.y === y; }) ? 'no USD gifts in the selected year' : '';
+    log('statement button: ' + (why ? 'not shown (' + why + ')' : 'shown'));
+    return why ? null : btn('Print or save as PDF', function () { statement(y); }, 'secondary');
+  }
+  function statement(y) { // fills in the team's text and prints it with the browser's own print: no library, nothing leaves the page
+    var tpl = qs('#sh-statement'), me = (S.data && S.data.me) || {}, now = new Date(); if (!tpl || !S.history) return;
+    var rows = S.history.list.filter(function (r) { return r.c === 'USD' && r.dt.y === y; }).sort(function (a, b) { return b.k - a.k; }); // newest first, as in Giving history
+    var total = cents(rows.reduce(function (s, r) { return s + r.a; }, 0));
+    var words = { date: longDate(now.getFullYear(), now.getMonth() + 1, now.getDate()), year: String(y), first_name: me.first || 'friend', gift_count: rows.length + (rows.length === 1 ? ' gift' : ' gifts'), total: usd(total) };
+    var blocks = { // a paragraph holding only one of these placeholders becomes the block
+      donor_address: function () { return el('p', { class: 'sh-st-address' }, [me.name, me.line1, placeLine(me), me.country].filter(Boolean).reduce(function (a, v, i) { return a.concat(i ? [el('br'), v] : [v]); }, [])); },
+      gifts: function () {
+        return el('table', { class: 'sh-st-table' }, [el('thead', {}, [el('tr', {}, ['Date', 'Gift', 'Paid with', 'Amount'].map(function (t, i) { return el('th', { scope: 'col', class: i === 3 ? 'sh-num' : null, text: t }); }))]),
+          el('tbody', {}, rows.map(function (r) { return el('tr', {}, [el('td', { text: longDate(r.dt.y, r.dt.m, r.dt.d) }), el('td', { text: r.type }), el('td', { text: r.paid || '' }), el('td', { class: 'sh-num', text: usd(r.a) })]); })
+            .concat([el('tr', { class: 'sh-st-total' }, [el('th', { scope: 'row', colspan: '3', text: 'Total' }), el('td', { class: 'sh-num', text: usd(total) })])]))]); // a total row, not a tfoot, which would repeat on every page
+      }
+    };
+    var box = el('div', { id: 'sh-print' }), walk, t;
+    Array.prototype.forEach.call(tpl.childNodes, function (n) { box.appendChild(n.cloneNode(true)); });
+    walk = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+    while ((t = walk.nextNode())) t.nodeValue = t.nodeValue.replace(/\{(\w+)\}/g, function (m, k) { k = k.toLowerCase(); return k in words ? words[k] : m; }); // a misspelt placeholder stays visible
+    qsa('p', box).forEach(function (p) { var k = ((p.textContent.trim().match(/^\{(\w+)\}$/) || [])[1] || '').toLowerCase(); if (blocks[k]) p.replaceWith(blocks[k]()); });
+    var hrs = qsa('hr', box);
+    if (hrs.length) { // above the first line: the header band, logo left, the rest right
+      var head = el('div', { class: 'sh-st-head' }), title = el('div', { class: 'sh-st-title' });
+      while (box.firstChild !== hrs[0]) { var n = box.firstChild; (n.nodeType === 1 && (n.tagName === 'IMG' || qs('img', n)) ? head : title).appendChild(n); }
+      head.appendChild(title); box.insertBefore(head, hrs[0]);
+    }
+    if (hrs.length > 1) { // the last line and what follows: a footer at the bottom of every printed page (fixed), with an invisible copy in the
+      // table's repeating footer row keeping exactly its height free on each page, so the gift list never runs under it
+      var foot = el('div', { class: 'sh-st-foot' }), last = hrs[hrs.length - 1], cell = el('td');
+      while (last.nextSibling) foot.appendChild(last.nextSibling); foot.insertBefore(last, foot.firstChild);
+      var room = foot.cloneNode(true); room.className = 'sh-st-foot sh-st-room'; room.setAttribute('aria-hidden', 'true');
+      while (box.firstChild) cell.appendChild(box.firstChild);
+      box.appendChild(el('table', { class: 'sh-st-page', role: 'presentation' }, [el('tbody', {}, [el('tr', {}, [cell])]), el('tfoot', {}, [el('tr', {}, [el('td', {}, [room])])])]));
+      box.appendChild(foot);
+    }
+    var old = qs('#sh-print'); if (old) old.remove(); document.body.appendChild(box);
+    log('statement: ' + rows.length + ' gift(s) for ' + y);
+    var img = qs('img', box), name = document.title, h = qs('h1, h2', box);
+    (img && !img.complete ? new Promise(function (r) { img.onload = img.onerror = r; setTimeout(r, 3000); }) : Promise.resolve()).then(function () {
+      document.title = (h && h.textContent.trim()) || 'Giving statement ' + y; // the browser's suggested PDF file name
+      var top = window.scrollY; window.scrollTo(0, 0); // Chrome shifts a fixed footer by the scroll position when printing, pushing it off the page
+      window.addEventListener('afterprint', function () { document.title = name; box.remove(); window.scrollTo(0, top); }, { once: true }); // a later Ctrl+P prints the page as usual
+      window.print();
+    });
+  }
   function openTile(type) { var t = qs('.en__component--hubgadget[data-componenttype="' + type + '"]'); if (t) t.click(); }
   function accountCards() {
     var out = [], me = (S.data && S.data.me) || {}, det = qs('[data-componenttype="SUPPORTER_DETAILS"]'), subs = qs('[data-componenttype="SUPPORTER_SUBSCRIPTIONS"]');
-    var place = [me.city, [me.region, me.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    var place = placeLine(me);
     if (det || subs) out.push(el('section', { class: 'sh-card sh-card--outline', 'aria-labelledby': det ? 'sh-me-h' : 'sh-prefs-h' }, (det ? [el('h2', { id: 'sh-me-h', text: 'My details' }),
       el('div', { class: 'sh-lines' }, [me.name, me.email, me.phone, me.line1, place, me.country].filter(Boolean).map(function (v) { return el('p', { text: v }); })),
       btn('Update my details', function () { openTile('SUPPORTER_DETAILS'); }, 'secondary')] : []).concat(subs ? [
       el(det ? 'h3' : 'h2', { id: 'sh-prefs-h', class: 'sh-subhead', text: 'Communication preferences' }),
       el('p', { class: 'sh-lines', text: 'Choose which newsletters, alerts and messages you get.' }),
       btn('Manage communication preferences', function () { openTile('SUPPORTER_SUBSCRIPTIONS'); }, 'secondary')] : [])));
-    var c = CFG.contact;
-    out.push(el('section', { id: 'sh-help', class: 'sh-card sh-card--inverse', 'aria-labelledby': 'sh-help-h', tabindex: '-1' }, [el('h2', { id: 'sh-help-h', text: 'Questions about your gift?' }),
-      el('p', { text: c.name + ' can help with anything about your giving, including skipping a payment or pausing for a set time, or any other changes you may wish to make.' }),
-      el('p', { class: 'sh-strong' }, [mailLink()]),
-      el('p', { class: 'sh-strong' }, [el('a', { href: 'tel:+' + c.phoneDigits, text: c.phone + ' (' + c.phoneDigits + ')' }), ',', el('br'), c.hours])]));
+    var help = helpCard(); if (help) out.push(help);
     return out;
+  }
+  function helpBlock() { // the help card's text: EN's copy block holding a gifts@stand.earth link (never the statement's code block), edited in EN admin
+    return qsa('.en__component--copyblock, .en__component--codeblock').filter(function (b) { return !qs('#sh-statement', b) && qs('a[href^="mailto:' + CFG.contact.email + '"]', b); })[0] || null;
+  }
+  function helpCard() { // the black "Questions about your gift?" card: a copy of EN's block, its first heading as the card's heading
+    var b = helpBlock(); if (!b) { log('help card: not shown (no EN block with a ' + CFG.contact.email + ' link)'); return null; }
+    var card = el('section', { id: 'sh-help', class: 'sh-card sh-card--inverse', tabindex: '-1' });
+    Array.prototype.forEach.call(b.childNodes, function (n) { card.appendChild(n.cloneNode(true)); });
+    qsa('[style]', card).forEach(function (n) { n.removeAttribute('style'); }); // the card's look, not EN's inline styles
+    var h = qs('h1, h2, h3, h4, h5, h6', card);
+    if (h) { h.replaceWith(el('h2', { id: 'sh-help-h', text: h.textContent.trim() })); card.setAttribute('aria-labelledby', 'sh-help-h'); }
+    return card;
   }
   function historyKids() { return [givingCard(), historyCard()].filter(Boolean); }
   function updateHistory(h) { // redraws only the giving cards, so focus and the rest of the page stay put
@@ -689,8 +762,7 @@
   }
   function render() {
     var host = qs('#sh-dash'); if (!host || !S.data) return;
-    var cards = mainCards().filter(Boolean);
-    var top = banners().filter(Boolean), side = accountCards();
+    var top = banners().filter(Boolean), cards = mainCards().filter(Boolean), side = accountCards(); // banners first: the subtle ask waits while the upgrade banner shows
     host.replaceChildren(
       el('div', { id: 'sh-notice', role: 'status' }),
       el('div', { class: 'sh-dash__body' }, top.concat([el('div', { class: 'sh-dash__grid' }, [
@@ -701,7 +773,7 @@
     host.classList.toggle('sh-hidden', empty); if (empty) log('dashboard: nothing to show yet, keeping EN tiles');
     var tile = en.tile(); if (tile) tile.classList.toggle('sh-tile--replaced', cards.length > 0); // tile stays clickable by the driver
     var first = qs('.en__component--hubgadget');
-    qsa('.en__component--copyblock').forEach(function (b) { if (first && first.compareDocumentPosition(b) & 4 && qs('a[href^="mailto:' + CFG.contact.email + '"]', b)) b.classList.toggle('sh-hidden', !empty); });
+    var hb = helpBlock(); if (hb) hb.classList.toggle('sh-hidden', !empty); // its text shows in the help card instead
     ['SUPPORTER_DETAILS', 'SUPPORTER_SUBSCRIPTIONS', 'TXN_GIVING'].forEach(function (t) { var n = qs('.en__component--hubgadget[data-componenttype="' + t + '"]'); if (n) n.classList.toggle('sh-tile--replaced', !empty); });
   }
   function resumeCombine() { // EN refreshed the page between the two combine steps: offer step 2 again
@@ -977,7 +1049,7 @@
       el('h1', { id: 'sh-signedout-h', text: 'Your session has ended' }),
       el('p', { text: 'For your security, the portal signs you out after a while, or when you open another Stand.earth page such as a donation form. To continue, finish signing out, then sign in again with a new link.' }),
       el('div', { class: 'sh-row', style: 'margin:16px 0' }, [el('a', { class: 'sh-btn', href: enOut ? enOut.href : location.origin + '/page/' + pageId() + '/' + CFG.signInPath, text: enOut ? 'Finish signing out' : 'Request a new sign-in link' })]),
-      el('p', { class: 'sh-hint' }, ['Questions? Contact ' + c.name + ' at ', mailLink(), ' or ', el('a', { href: 'tel:+' + c.phoneDigits, text: c.phone }), '.'])]), anchor);
+      el('p', { class: 'sh-hint' }, ['Questions? Contact Donor Services at ', mailLink(), ' or ', el('a', { href: 'tel:+' + c.phoneDigits, text: c.phone }), '.'])]), anchor);
     title('Session ended');
   }
   function boot() {
